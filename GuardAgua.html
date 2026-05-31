@@ -1,0 +1,1168 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GuardAgua — Sistema de Monitoreo IoT</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css"/>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --P:#005F87; --P2:#007BA8; --C:#00B4D8; --C2:#0096BB;
+  --G:#38BE6C; --G2:#2DA85A;
+  --R:#E53935; --O:#FF8C00;
+  --BG:#060F1A; --BG2:#091525; --BG3:#0C1C30;
+  --CARD:rgba(9,21,37,0.97);
+  --GLASS:rgba(0,180,216,0.06);
+  --BORDER:rgba(0,180,216,0.18);
+  --T1:#F0F6FF; --T2:rgba(240,246,255,.65); --T3:rgba(240,246,255,.35);
+  --MONO:'DM Mono',monospace;
+  --FONT:'Outfit',-apple-system,sans-serif;
+  --SHADOW: 0 8px 40px rgba(0,0,0,.55);
+}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{height:100%;overflow:hidden;font-family:var(--FONT);background:var(--BG);color:var(--T1)}
+
+/* ── SPLASH ─────────────────────────── */
+#splash{
+  position:fixed;inset:0;z-index:9999;
+  background:linear-gradient(155deg,#060F1A 0%,#00304A 55%,#001E31 100%);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:0;
+  transition:opacity .9s ease,transform .9s ease;
+}
+#splash.out{opacity:0;transform:scale(1.06);pointer-events:none}
+.s-logo{animation:floatY 3s ease-in-out infinite}
+@keyframes floatY{0%,100%{transform:translateY(0)}50%{transform:translateY(-14px)}}
+.s-rings{position:relative;width:140px;height:140px;display:flex;align-items:center;justify-content:center;margin-bottom:28px}
+.s-ring{
+  position:absolute;border-radius:50%;border:1px solid rgba(0,180,216,.25);
+  animation:expand 3s ease-out infinite;
+}
+.s-ring:nth-child(1){width:80px;height:80px;animation-delay:0s}
+.s-ring:nth-child(2){width:110px;height:110px;animation-delay:.6s}
+.s-ring:nth-child(3){width:140px;height:140px;animation-delay:1.2s}
+@keyframes expand{0%{opacity:.8;transform:scale(.85)}100%{opacity:0;transform:scale(1.1)}}
+.s-title{font-size:clamp(2.2rem,6vw,3.4rem);font-weight:900;letter-spacing:-1.5px;line-height:1}
+.s-title em{font-style:normal;color:var(--C)}
+.s-sub{font-size:.72rem;letter-spacing:4px;text-transform:uppercase;color:var(--C);margin:10px 0 40px;opacity:.8}
+.s-bar{width:220px;height:3px;background:rgba(255,255,255,.08);border-radius:2px;overflow:hidden}
+.s-bar-fill{height:100%;background:linear-gradient(90deg,var(--C),var(--G));border-radius:2px;animation:fill 2.5s ease forwards}
+@keyframes fill{from{width:0}to{width:100%}}
+.s-steps{margin-top:20px;font-size:.72rem;font-family:var(--MONO);color:var(--T3);height:16px;overflow:hidden}
+.s-step{animation:stepIn .4s ease both}
+@keyframes stepIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+
+/* ── MODAL ─────────────────────────── */
+#modal{
+  position:fixed;inset:0;z-index:800;
+  background:rgba(0,0,0,.75);backdrop-filter:blur(12px);
+  display:flex;align-items:center;justify-content:center;
+  opacity:0;pointer-events:none;transition:opacity .35s;
+}
+#modal.show{opacity:1;pointer-events:all}
+.mbox{
+  background:linear-gradient(145deg,#0C1C30,#060F1A);
+  border:1px solid var(--BORDER);border-radius:22px;
+  padding:32px 28px;width:92%;max-width:460px;
+  box-shadow:0 24px 80px rgba(0,0,0,.7);
+  transform:translateY(24px);transition:transform .35s;
+}
+#modal.show .mbox{transform:translateY(0)}
+.m-head{display:flex;align-items:center;gap:14px;margin-bottom:22px}
+.m-title{font-size:1.55rem;font-weight:800;letter-spacing:-.5px}
+.m-sub{color:var(--C);font-size:.72rem;letter-spacing:2.5px;text-transform:uppercase;margin-top:2px}
+.m-desc{color:var(--T2);font-size:.84rem;line-height:1.65;margin-bottom:26px}
+.mbtn{
+  width:100%;padding:14px 18px;border:none;border-radius:13px;
+  cursor:pointer;font-family:var(--FONT);font-size:.9rem;font-weight:600;
+  display:flex;align-items:center;gap:14px;transition:all .22s;margin-bottom:10px;
+  text-align:left;
+}
+.mbtn-p{background:linear-gradient(135deg,var(--C),var(--P));color:#fff}
+.mbtn-p:hover{transform:translateY(-2px);box-shadow:0 10px 28px rgba(0,180,216,.45)}
+.mbtn-s{background:var(--GLASS);color:var(--T1);border:1px solid var(--BORDER)}
+.mbtn-s:hover{background:rgba(0,180,216,.12)}
+.mbtn-icon{font-size:1.4rem;flex-shrink:0}
+.mbtn-label{font-size:.72rem;font-weight:400;opacity:.75;margin-top:1px}
+.divider{display:flex;align-items:center;gap:10px;color:var(--T3);font-size:.73rem;margin:14px 0}
+.divider::before,.divider::after{content:'';flex:1;height:1px;background:var(--BORDER)}
+.csel{
+  width:100%;background:rgba(0,0,0,.4);border:1px solid var(--BORDER);
+  border-radius:11px;color:var(--T1);padding:12px 16px;
+  font-size:.88rem;font-family:var(--FONT);appearance:none;cursor:pointer;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%2300B4D8' stroke-width='2' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+  background-repeat:no-repeat;background-position:right 14px center;padding-right:38px;
+}
+.csel:focus{outline:none;border-color:var(--C)}
+.m-privacy{font-size:.7rem;color:var(--T3);text-align:center;margin-top:14px}
+
+/* ── NAV ─────────────────────────── */
+.nav{
+  height:58px;display:flex;align-items:center;justify-content:space-between;
+  padding:0 18px;background:rgba(6,15,26,.97);
+  border-bottom:1px solid var(--BORDER);backdrop-filter:blur(20px);
+  flex-shrink:0;z-index:100;position:relative;
+}
+.nav-brand{display:flex;align-items:center;gap:10px;cursor:pointer}
+.nav-wordmark{font-size:1.35rem;font-weight:900;letter-spacing:-.5px}
+.nav-wordmark em{font-style:normal;color:var(--C)}
+.nav-right{display:flex;align-items:center;gap:8px}
+.nav-pill{
+  display:flex;align-items:center;gap:7px;
+  background:var(--GLASS);border:1px solid var(--BORDER);
+  border-radius:20px;padding:5px 13px;
+  font-size:.75rem;color:var(--T2);cursor:pointer;
+  transition:all .2s;white-space:nowrap;max-width:200px;overflow:hidden;text-overflow:ellipsis;
+}
+.nav-pill:hover{background:rgba(0,180,216,.12);border-color:var(--C)}
+.nav-pill .dot{width:7px;height:7px;border-radius:50%;background:var(--G);flex-shrink:0;animation:pdot 2s infinite}
+@keyframes pdot{0%,100%{box-shadow:0 0 0 0 rgba(56,190,108,.7)}50%{box-shadow:0 0 0 5px rgba(56,190,108,0)}}
+.nav-clock{font-family:var(--MONO);font-size:.72rem;color:var(--C);
+  background:rgba(0,180,216,.08);border:1px solid rgba(0,180,216,.15);
+  border-radius:8px;padding:5px 10px;letter-spacing:.5px}
+
+/* ── LAYOUT ─────────────────────────── */
+#app{display:flex;flex-direction:column;height:100vh;opacity:0;transition:opacity .5s}
+#app.on{opacity:1}
+.main{display:flex;flex:1;overflow:hidden;position:relative}
+
+/* ── MAP ─────────────────────────── */
+.map-wrap{flex:1;position:relative}
+#map{width:100%;height:100%;z-index:1}
+
+/* Map top stats bar */
+.map-stats{
+  position:absolute;top:12px;left:50%;transform:translateX(-50%);
+  z-index:400;display:flex;gap:8px;
+  background:rgba(6,15,26,.92);border:1px solid var(--BORDER);
+  border-radius:30px;padding:8px 18px;backdrop-filter:blur(16px);
+  box-shadow:var(--SHADOW);
+}
+.mstat{display:flex;align-items:center;gap:6px;font-size:.75rem}
+.mstat-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.mstat-val{font-family:var(--MONO);font-weight:500}
+.mstat-sep{color:var(--T3);padding:0 4px}
+
+/* Map controls */
+.map-ctrl{position:absolute;bottom:40px;right:12px;z-index:400;display:flex;flex-direction:column;gap:6px}
+.mcbtn{
+  background:rgba(6,15,26,.94);border:1px solid var(--BORDER);
+  color:var(--T1);padding:9px 14px;border-radius:10px;
+  cursor:pointer;font-size:.72rem;font-family:var(--FONT);font-weight:600;
+  backdrop-filter:blur(12px);transition:all .2s;
+  display:flex;align-items:center;gap:6px;white-space:nowrap;
+}
+.mcbtn:hover{background:rgba(0,180,216,.15);border-color:var(--C);color:var(--C)}
+
+/* Legend */
+.map-legend{
+  position:absolute;bottom:40px;left:12px;z-index:400;
+  background:rgba(6,15,26,.94);border:1px solid var(--BORDER);
+  border-radius:12px;padding:12px 15px;backdrop-filter:blur(12px);
+  box-shadow:var(--SHADOW);
+}
+.leg-title{font-size:.62rem;letter-spacing:2px;text-transform:uppercase;color:var(--T3);margin-bottom:8px}
+.leg-row{display:flex;align-items:center;gap:8px;font-size:.75rem;color:var(--T2);margin-bottom:5px}
+.leg-row:last-child{margin-bottom:0}
+.leg-dot{width:11px;height:11px;border-radius:50%;flex-shrink:0}
+
+/* ── SIDE PANEL ─────────────────────────── */
+.panel{
+  width:330px;background:var(--CARD);
+  border-left:1px solid var(--BORDER);
+  display:flex;flex-direction:column;overflow:hidden;
+  flex-shrink:0;
+}
+
+/* Status Card */
+.sc{
+  padding:18px 18px 16px;border-bottom:1px solid var(--BORDER);
+  transition:background 1.2s ease;position:relative;overflow:hidden;
+}
+.sc.on{background:linear-gradient(135deg,rgba(0,180,216,.12) 0%,rgba(56,190,108,.07) 100%)}
+.sc.off{background:linear-gradient(135deg,rgba(229,57,53,.12) 0%,rgba(180,0,0,.04) 100%)}
+.sc.risk{background:linear-gradient(135deg,rgba(255,140,0,.12) 0%,rgba(229,57,53,.06) 100%)}
+.sc-wave{
+  position:absolute;bottom:-20px;left:-10%;right:-10%;height:60px;
+  background:linear-gradient(180deg,transparent,rgba(0,180,216,.08));
+  border-radius:50% 50% 0 0;
+  animation:waveAnim 4s ease-in-out infinite;
+  pointer-events:none;
+}
+.sc-wave2{
+  position:absolute;bottom:-30px;left:-15%;right:-15%;height:65px;
+  background:linear-gradient(180deg,transparent,rgba(0,180,216,.05));
+  border-radius:50% 50% 0 0;
+  animation:waveAnim 5.5s ease-in-out infinite reverse;
+  pointer-events:none;
+}
+@keyframes waveAnim{0%,100%{transform:translateX(0) scaleY(1)}50%{transform:translateX(3%) scaleY(1.15)}}
+.sc-top{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:12px}
+.sc-colony{font-size:1.05rem;font-weight:800;letter-spacing:-.3px}
+.sc-sub{font-size:.7rem;color:var(--T3);margin-top:2px;font-family:var(--MONO)}
+.sc-icon{
+  width:48px;height:48px;border-radius:50%;
+  display:flex;align-items:center;justify-content:center;font-size:1.6rem;
+  position:relative;flex-shrink:0;
+}
+.sc-icon.on{background:radial-gradient(circle,rgba(0,180,216,.25),rgba(56,190,108,.12));animation:rippleG 2.5s infinite}
+.sc-icon.off{background:radial-gradient(circle,rgba(229,57,53,.2),transparent);animation:rippleR 2s infinite}
+.sc-icon.risk{background:radial-gradient(circle,rgba(255,140,0,.25),transparent);animation:rippleO 2s infinite}
+@keyframes rippleG{0%{box-shadow:0 0 0 0 rgba(56,190,108,.5)}70%{box-shadow:0 0 0 18px rgba(56,190,108,0)}100%{box-shadow:0 0 0 0 rgba(56,190,108,0)}}
+@keyframes rippleR{0%{box-shadow:0 0 0 0 rgba(229,57,53,.5)}70%{box-shadow:0 0 0 15px rgba(229,57,53,0)}100%{box-shadow:0 0 0 0 rgba(229,57,53,0)}}
+@keyframes rippleO{0%{box-shadow:0 0 0 0 rgba(255,140,0,.5)}70%{box-shadow:0 0 0 15px rgba(255,140,0,0)}100%{box-shadow:0 0 0 0 rgba(255,140,0,0)}}
+.sc-badge{
+  display:inline-flex;align-items:center;gap:6px;
+  padding:5px 12px;border-radius:20px;font-size:.72rem;font-weight:700;letter-spacing:.8px;
+}
+.sc-badge.on{background:rgba(56,190,108,.18);color:var(--G);border:1px solid rgba(56,190,108,.35)}
+.sc-badge.off{background:rgba(229,57,53,.18);color:#FF6B6B;border:1px solid rgba(229,57,53,.35)}
+.sc-badge.risk{background:rgba(255,140,0,.18);color:var(--O);border:1px solid rgba(255,140,0,.35)}
+.sc-msg{font-size:.8rem;color:var(--T2);line-height:1.55;margin:10px 0}
+.sc-eta{
+  background:rgba(0,0,0,.25);border:1px solid rgba(255,140,0,.25);
+  border-radius:9px;padding:10px 12px;
+}
+.sc-eta-label{font-size:.62rem;letter-spacing:2px;text-transform:uppercase;color:var(--T3);margin-bottom:4px}
+.sc-eta-val{font-family:var(--MONO);font-size:1.5rem;font-weight:500;color:var(--O)}
+.sc-eta-val.green{color:var(--G)}
+
+/* Stats row */
+.stats-row{
+  display:grid;grid-template-columns:1fr 1fr 1fr;
+  border-bottom:1px solid var(--BORDER);
+}
+.sbox{padding:12px 10px;text-align:center;border-right:1px solid var(--BORDER)}
+.sbox:last-child{border-right:none}
+.sbox-val{font-family:var(--MONO);font-size:1.55rem;font-weight:500;line-height:1}
+.sbox-val.g{color:var(--G)}
+.sbox-val.r{color:var(--R)}
+.sbox-val.o{color:var(--O)}
+.sbox-label{font-size:.6rem;letter-spacing:1.5px;text-transform:uppercase;color:var(--T3);margin-top:4px}
+
+/* Tabs */
+.tabs{display:flex;border-bottom:1px solid var(--BORDER);flex-shrink:0}
+.tab{
+  flex:1;padding:10px 6px;text-align:center;font-size:.72rem;font-weight:600;
+  color:var(--T3);cursor:pointer;transition:all .2s;letter-spacing:.8px;
+  text-transform:uppercase;border-bottom:2px solid transparent;
+}
+.tab.a{color:var(--C);border-bottom-color:var(--C)}
+.tab:hover:not(.a){color:var(--T2)}
+
+/* Scrollable panel */
+.pcontent{flex:1;overflow-y:auto;scrollbar-width:thin;scrollbar-color:var(--P) transparent}
+.pcontent::-webkit-scrollbar{width:3px}
+.pcontent::-webkit-scrollbar-thumb{background:var(--P);border-radius:2px}
+
+/* Colony item */
+.ci{
+  display:flex;align-items:center;gap:11px;
+  padding:11px 16px;border-bottom:1px solid rgba(255,255,255,.04);
+  cursor:pointer;transition:background .18s;
+}
+.ci:hover{background:rgba(0,180,216,.06)}
+.ci.user{border-left:3px solid var(--G);padding-left:13px}
+.ci.selected{background:rgba(0,180,216,.08)}
+.cidot{width:11px;height:11px;border-radius:50%;flex-shrink:0}
+.cidot.on{background:var(--G);box-shadow:0 0 7px rgba(56,190,108,.65)}
+.cidot.off{background:var(--R);box-shadow:0 0 7px rgba(229,57,53,.65)}
+.cidot.risk{background:var(--O);box-shadow:0 0 7px rgba(255,140,0,.65)}
+.ci-name{font-size:.83rem;font-weight:600;flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ci-detail{font-size:.68rem;color:var(--T3);margin-top:2px}
+.ci-zone{font-size:.68rem;color:var(--T3);font-family:var(--MONO);flex-shrink:0}
+
+/* Event item */
+.ei{display:flex;align-items:flex-start;gap:11px;padding:12px 16px;border-bottom:1px solid rgba(255,255,255,.04)}
+.ei-icon{
+  width:30px;height:30px;border-radius:50%;
+  display:flex;align-items:center;justify-content:center;font-size:.85rem;flex-shrink:0;margin-top:1px;
+}
+.ei-icon.on{background:rgba(56,190,108,.18)}
+.ei-icon.off{background:rgba(229,57,53,.18)}
+.ei-icon.risk{background:rgba(255,140,0,.18)}
+.ei-msg{font-size:.78rem;color:var(--T2);line-height:1.5}
+.ei-time{font-size:.68rem;color:var(--T3);margin-top:4px;font-family:var(--MONO)}
+
+/* ── NOTIFICATIONS ─────────────────────────── */
+#notifs{
+  position:fixed;top:70px;right:16px;z-index:2000;
+  display:flex;flex-direction:column;gap:10px;max-width:320px;pointer-events:none;
+}
+.notif{
+  background:rgba(6,15,26,.97);border:1px solid var(--BORDER);
+  border-radius:14px;padding:14px 16px;
+  box-shadow:0 12px 40px rgba(0,0,0,.5);backdrop-filter:blur(24px);
+  transform:translateX(360px);transition:transform .45s cubic-bezier(.175,.885,.32,1.275);
+  display:flex;gap:12px;align-items:flex-start;pointer-events:all;
+}
+.notif.in{transform:translateX(0)}
+.notif.water-on{border-left:4px solid var(--G)}
+.notif.water-off{border-left:4px solid var(--R)}
+.notif.risk{border-left:4px solid var(--O)}
+.n-ico{font-size:1.35rem;flex-shrink:0;line-height:1.2}
+.n-title{font-size:.84rem;font-weight:700;margin-bottom:3px}
+.n-body{font-size:.76rem;color:var(--T2);line-height:1.45}
+.n-time{font-size:.67rem;color:var(--T3);margin-top:5px;font-family:var(--MONO)}
+.n-close{
+  cursor:pointer;color:var(--T3);padding:0 2px;font-size:.9rem;
+  margin-left:auto;flex-shrink:0;transition:color .2s;line-height:1;
+}
+.n-close:hover{color:var(--T1)}
+
+/* ── MOBILE BOTTOM NAV ─────────────────────────── */
+.bnav{
+  display:none;position:fixed;bottom:0;left:0;right:0;
+  background:rgba(6,15,26,.97);border-top:1px solid var(--BORDER);
+  padding:6px 8px 8px;z-index:500;
+  justify-content:space-around;backdrop-filter:blur(20px);
+}
+.bni{
+  display:flex;flex-direction:column;align-items:center;gap:3px;
+  padding:6px 18px;cursor:pointer;font-size:.62rem;font-weight:600;
+  color:var(--T3);transition:color .2s;letter-spacing:.5px;text-transform:uppercase;
+}
+.bni.a{color:var(--C)}
+.bni-ico{font-size:1.25rem}
+
+/* Mobile sheet */
+#msheet{
+  display:none;position:fixed;bottom:56px;left:0;right:0;z-index:400;
+  background:var(--CARD);border-top:1px solid var(--BORDER);
+  max-height:62vh;overflow-y:auto;
+  padding:16px;
+}
+
+/* ── LEAFLET OVERRIDES ─────────────────────────── */
+.leaflet-popup-content-wrapper{
+  background:rgba(6,15,26,.97)!important;
+  border:1px solid rgba(0,180,216,.3)!important;
+  border-radius:14px!important;
+  color:var(--T1)!important;
+  box-shadow:0 12px 48px rgba(0,0,0,.6)!important;
+  padding:0!important;
+}
+.leaflet-popup-content{margin:0!important;padding:16px 18px!important}
+.leaflet-popup-tip-container{margin-top:-1px}
+.leaflet-popup-tip{background:rgba(6,15,26,.97)!important}
+.leaflet-popup-close-button{color:var(--T3)!important;font-size:18px!important;top:10px!important;right:12px!important}
+.leaflet-popup-close-button:hover{color:var(--T1)!important}
+.leaflet-container{background:#060F1A}
+.leaflet-control-zoom a{
+  background:rgba(6,15,26,.94)!important;color:var(--T1)!important;
+  border:1px solid var(--BORDER)!important;
+}
+.leaflet-control-zoom a:hover{background:rgba(0,180,216,.15)!important;color:var(--C)!important}
+.leaflet-bar{border:none!important;box-shadow:var(--SHADOW)!important}
+
+/* ── RESPONSIVE ─────────────────────────── */
+@media(max-width:900px){.panel{display:none}.bnav{display:flex}}
+@media(max-width:480px){
+  .map-stats{font-size:.68rem;padding:6px 13px}
+  .nav-clock{display:none}
+}
+
+/* ── PARTICLES ─────────────────────────── */
+.particle{
+  position:fixed;pointer-events:none;z-index:3000;
+  font-size:1.2rem;animation:particleFly 1.4s ease-out forwards;
+}
+@keyframes particleFly{
+  0%{opacity:1;transform:translateY(0) scale(1)}
+  100%{opacity:0;transform:translateY(-80px) scale(.3)}
+}
+
+/* Tab panes */
+.tpane{display:none}
+.tpane.a{display:block}
+
+/* Empty state */
+.empty{padding:30px;text-align:center;color:var(--T3);font-size:.82rem}
+
+/* Pulse ring for user colony on map */
+@keyframes pusr{
+  0%{box-shadow:0 0 0 0 rgba(0,180,216,.8),0 0 14px rgba(56,190,108,.6)}
+  100%{box-shadow:0 0 0 20px rgba(0,180,216,0),0 0 14px rgba(56,190,108,.6)}
+}
+</style>
+</head>
+<body>
+
+<!-- ╔══ SPLASH ══╗ -->
+<div id="splash">
+  <div class="s-rings s-logo">
+    <div class="s-ring"></div>
+    <div class="s-ring"></div>
+    <div class="s-ring"></div>
+    <!-- Logo SVG -->
+    <svg width="72" height="84" viewBox="0 0 120 140" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <linearGradient id="lg1" x1="10" y1="5" x2="110" y2="133" gradientUnits="userSpaceOnUse">
+          <stop offset="0%" stop-color="#00D4FF"/>
+          <stop offset="100%" stop-color="#003D5C"/>
+        </linearGradient>
+        <linearGradient id="lg2" x1="35" y1="25" x2="85" y2="103" gradientUnits="userSpaceOnUse">
+          <stop offset="0%" stop-color="#005F87"/>
+          <stop offset="100%" stop-color="#002845"/>
+        </linearGradient>
+      </defs>
+      <path d="M60 4 C55 14 8 68 8 92 C8 120 32 136 60 136 C88 136 112 120 112 92 C112 68 65 14 60 4Z" fill="url(#lg1)"/>
+      <path d="M60 26 L86 40 L86 70 C86 90 60 106 60 106 C60 106 34 90 34 70 L34 40Z" fill="url(#lg2)"/>
+      <path d="M68 52 C62 47 50 50 48 61 C46 72 53 79 62 78 L62 71 L58 71 L58 65 L69 65 L69 78 C61 83 44 80 43 61 C41 43 57 40 69 46Z" fill="white" opacity=".92"/>
+    </svg>
+  </div>
+  <div class="s-title">Guard<em>Agua</em></div>
+  <div class="s-sub">Sistema de Monitoreo IoT</div>
+  <div class="s-bar"><div class="s-bar-fill"></div></div>
+  <div class="s-steps" id="s-steps">Inicializando sensores...</div>
+</div>
+
+<!-- ╔══ MODAL UBICACIÓN ══╗ -->
+<div id="modal">
+  <div class="mbox">
+    <div class="m-head">
+      <svg width="44" height="52" viewBox="0 0 120 140" fill="none">
+        <defs>
+          <linearGradient id="mlg1" x1="10" y1="5" x2="110" y2="133" gradientUnits="userSpaceOnUse">
+            <stop offset="0%" stop-color="#00D4FF"/>
+            <stop offset="100%" stop-color="#003D5C"/>
+          </linearGradient>
+          <linearGradient id="mlg2" x1="35" y1="25" x2="85" y2="103" gradientUnits="userSpaceOnUse">
+            <stop offset="0%" stop-color="#005F87"/>
+            <stop offset="100%" stop-color="#002845"/>
+          </linearGradient>
+        </defs>
+        <path d="M60 4 C55 14 8 68 8 92 C8 120 32 136 60 136 C88 136 112 120 112 92 C112 68 65 14 60 4Z" fill="url(#mlg1)"/>
+        <path d="M60 26 L86 40 L86 70 C86 90 60 106 60 106 C60 106 34 90 34 70 L34 40Z" fill="url(#mlg2)"/>
+        <path d="M68 52 C62 47 50 50 48 61 C46 72 53 79 62 78 L62 71 L58 71 L58 65 L69 65 L69 78 C61 83 44 80 43 61 C41 43 57 40 69 46Z" fill="white" opacity=".92"/>
+      </svg>
+      <div>
+        <div class="m-title">¡Bienvenido!</div>
+        <div class="m-sub">GuardAgua IoT</div>
+      </div>
+    </div>
+    <div class="m-desc">Para enviarte alertas personalizadas sobre el suministro de agua en tu colonia, necesitamos saber tu ubicación. También puedes tocar cualquier colonia en el mapa.</div>
+    <button class="mbtn mbtn-p" onclick="useGPS()">
+      <span class="mbtn-icon">📍</span>
+      <div><div>Usar mi ubicación actual</div><div class="mbtn-label">Detección automática vía GPS</div></div>
+    </button>
+    <button class="mbtn mbtn-s" onclick="pickOnMap()">
+      <span class="mbtn-icon">🗺️</span>
+      <div><div>Seleccionar en el mapa</div><div class="mbtn-label">Toca tu colonia directamente</div></div>
+    </button>
+    <div class="divider">o elige de la lista</div>
+    <select class="csel" id="csel" onchange="selectFromList(this.value)">
+      <option value="">— Seleccionar colonia —</option>
+    </select>
+    <div class="m-privacy">🔒 Tu ubicación solo se procesa localmente. No se comparte con terceros.</div>
+  </div>
+</div>
+
+<!-- ╔══ APP ══╗ -->
+<div id="app">
+  <!-- NAV -->
+  <nav class="nav">
+    <div class="nav-brand" onclick="openModal()">
+      <svg width="28" height="33" viewBox="0 0 120 140" fill="none">
+        <defs>
+          <linearGradient id="nlg1" x1="10" y1="5" x2="110" y2="133" gradientUnits="userSpaceOnUse">
+            <stop offset="0%" stop-color="#00D4FF"/>
+            <stop offset="100%" stop-color="#003D5C"/>
+          </linearGradient>
+          <linearGradient id="nlg2" x1="35" y1="25" x2="85" y2="103" gradientUnits="userSpaceOnUse">
+            <stop offset="0%" stop-color="#005F87"/>
+            <stop offset="100%" stop-color="#002845"/>
+          </linearGradient>
+        </defs>
+        <path d="M60 4 C55 14 8 68 8 92 C8 120 32 136 60 136 C88 136 112 120 112 92 C112 68 65 14 60 4Z" fill="url(#nlg1)"/>
+        <path d="M60 26 L86 40 L86 70 C86 90 60 106 60 106 C60 106 34 90 34 70 L34 40Z" fill="url(#nlg2)"/>
+        <path d="M68 52 C62 47 50 50 48 61 C46 72 53 79 62 78 L62 71 L58 71 L58 65 L69 65 L69 78 C61 83 44 80 43 61 C41 43 57 40 69 46Z" fill="white" opacity=".92"/>
+      </svg>
+      <div class="nav-wordmark">Guard<em>Agua</em></div>
+    </div>
+    <div class="nav-right">
+      <div class="nav-pill" onclick="openModal()">
+        <div class="dot"></div>
+        <span id="nav-colony">Seleccionar colonia</span>
+      </div>
+      <div class="nav-clock" id="nav-clock">00:00:00</div>
+    </div>
+  </nav>
+
+  <!-- MAIN -->
+  <div class="main">
+    <!-- MAP -->
+    <div class="map-wrap">
+      <div id="map"></div>
+
+      <!-- Map stats bar -->
+      <div class="map-stats">
+        <div class="mstat">
+          <div class="mstat-dot" style="background:var(--G);box-shadow:0 0 5px rgba(56,190,108,.6)"></div>
+          <span class="mstat-val" id="ms-on" style="color:var(--G)">—</span>
+          <span style="font-size:.7rem;color:var(--T3)"> con agua</span>
+        </div>
+        <div class="mstat-sep">|</div>
+        <div class="mstat">
+          <div class="mstat-dot" style="background:var(--R);box-shadow:0 0 5px rgba(229,57,53,.6)"></div>
+          <span class="mstat-val" id="ms-off" style="color:var(--R)">—</span>
+          <span style="font-size:.7rem;color:var(--T3)"> sin agua</span>
+        </div>
+        <div class="mstat-sep">|</div>
+        <div class="mstat">
+          <div class="mstat-dot" style="background:var(--O);box-shadow:0 0 5px rgba(255,140,0,.6)"></div>
+          <span class="mstat-val" id="ms-risk" style="color:var(--O)">—</span>
+          <span style="font-size:.7rem;color:var(--T3)"> en riesgo</span>
+        </div>
+      </div>
+
+      <!-- Controls -->
+      <div class="map-ctrl">
+        <button class="mcbtn" onclick="centerUser()">📍 Mi colonia</button>
+        <button class="mcbtn" onclick="openModal()">🔄 Cambiar</button>
+      </div>
+
+      <!-- Legend -->
+      <div class="map-legend">
+        <div class="leg-title">Estado del Suministro</div>
+        <div class="leg-row"><div class="leg-dot" style="background:var(--G);box-shadow:0 0 5px rgba(56,190,108,.6)"></div>Con agua</div>
+        <div class="leg-row"><div class="leg-dot" style="background:var(--R);box-shadow:0 0 5px rgba(229,57,53,.6)"></div>Sin suministro</div>
+        <div class="leg-row"><div class="leg-dot" style="background:var(--O);box-shadow:0 0 5px rgba(255,140,0,.6)"></div>En riesgo</div>
+        <div class="leg-row"><div class="leg-dot" style="background:var(--C);box-shadow:0 0 7px rgba(0,180,216,.8);border:2px solid white"></div>Mi colonia</div>
+      </div>
+    </div>
+
+    <!-- SIDE PANEL (desktop) -->
+    <div class="panel">
+      <!-- Status card -->
+      <div class="sc on" id="sc">
+        <div class="sc-wave"></div><div class="sc-wave2"></div>
+        <div class="sc-top">
+          <div>
+            <div class="sc-colony" id="sc-name">—</div>
+            <div class="sc-sub" id="sc-time">Sin colonia seleccionada</div>
+          </div>
+          <div class="sc-icon on" id="sc-icon">💧</div>
+        </div>
+        <div class="sc-badge on" id="sc-badge">✓ AGUA DISPONIBLE</div>
+        <div class="sc-msg" id="sc-msg">Selecciona tu colonia para iniciar el monitoreo personalizado.</div>
+        <div class="sc-eta" id="sc-eta" style="display:none">
+          <div class="sc-eta-label">⏳ Estimado de regreso</div>
+          <div class="sc-eta-val" id="sc-eta-val">—</div>
+        </div>
+      </div>
+
+      <!-- Stats -->
+      <div class="stats-row">
+        <div class="sbox">
+          <div class="sbox-val g" id="st-on">—</div>
+          <div class="sbox-label">Con Agua</div>
+        </div>
+        <div class="sbox">
+          <div class="sbox-val r" id="st-off">—</div>
+          <div class="sbox-label">Sin Agua</div>
+        </div>
+        <div class="sbox">
+          <div class="sbox-val o" id="st-risk">—</div>
+          <div class="sbox-label">En Riesgo</div>
+        </div>
+      </div>
+
+      <!-- Tabs -->
+      <div class="tabs">
+        <div class="tab a" onclick="switchTab('colonies',this)">Colonias</div>
+        <div class="tab" onclick="switchTab('events',this)">Eventos</div>
+        <div class="tab" onclick="switchTab('nearby',this)">Cercanas</div>
+      </div>
+
+      <!-- Content -->
+      <div class="pcontent">
+        <div id="t-colonies" class="tpane a"></div>
+        <div id="t-events" class="tpane"></div>
+        <div id="t-nearby" class="tpane"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MOBILE BOTTOM NAV -->
+  <div class="bnav">
+    <div class="bni a" onclick="mTab('map',this)"><div class="bni-ico">🗺️</div>Mapa</div>
+    <div class="bni" onclick="mTab('status',this)"><div class="bni-ico">💧</div>Estado</div>
+    <div class="bni" onclick="mTab('events',this)"><div class="bni-ico">📋</div>Eventos</div>
+    <div class="bni" onclick="mTab('nearby',this)"><div class="bni-ico">📡</div>Cercanas</div>
+  </div>
+</div>
+
+<!-- Mobile sheet -->
+<div id="msheet"></div>
+
+<!-- Notifications -->
+<div id="notifs"></div>
+
+<script>
+// ══════════════════════════════════════════
+// DATA
+// ══════════════════════════════════════════
+const COLONIES_RAW = [
+  {id:1,  name:"Centro Histórico",        lat:25.6716,lng:-100.3081,zone:"A"},
+  {id:2,  name:"Tecnológico",             lat:25.6500,lng:-100.2900,zone:"B"},
+  {id:3,  name:"Cumbres Elite",           lat:25.7480,lng:-100.3720,zone:"C"},
+  {id:4,  name:"Mitras Centro",           lat:25.6900,lng:-100.3400,zone:"A"},
+  {id:5,  name:"Country Sol",             lat:25.6600,lng:-100.2720,zone:"B"},
+  {id:6,  name:"Las Brisas",              lat:25.6300,lng:-100.3510,zone:"D"},
+  {id:7,  name:"San Jerónimo",            lat:25.6820,lng:-100.4200,zone:"E"},
+  {id:8,  name:"Casco Urbano",            lat:25.6750,lng:-100.3180,zone:"A"},
+  {id:9,  name:"Valle Oriente",           lat:25.6380,lng:-100.3620,zone:"D"},
+  {id:10, name:"La Purísima",             lat:25.6950,lng:-100.3100,zone:"A"},
+  {id:11, name:"Linda Vista Norte",       lat:25.7180,lng:-100.3290,zone:"C"},
+  {id:12, name:"Anáhuac",                 lat:25.7100,lng:-100.3050,zone:"C"},
+  {id:13, name:"Obispado",                lat:25.6650,lng:-100.3460,zone:"A"},
+  {id:14, name:"Roma",                    lat:25.6800,lng:-100.3160,zone:"A"},
+  {id:15, name:"Del Prado",               lat:25.6540,lng:-100.3240,zone:"B"},
+  {id:16, name:"Chapultepec",             lat:25.6750,lng:-100.3600,zone:"A"},
+  {id:17, name:"Colinas de S. Jerónimo",  lat:25.6630,lng:-100.4110,zone:"E"},
+  {id:18, name:"Nuevo Repueblo",          lat:25.6820,lng:-100.2980,zone:"B"},
+  {id:19, name:"La Fe",                   lat:25.7060,lng:-100.2810,zone:"C"},
+  {id:20, name:"Fierro",                  lat:25.6900,lng:-100.2700,zone:"B"},
+  {id:21, name:"Contry La Silla",         lat:25.6450,lng:-100.2600,zone:"B"},
+  {id:22, name:"Versalles",               lat:25.6700,lng:-100.3900,zone:"E"},
+  {id:23, name:"Loma Larga",              lat:25.6600,lng:-100.3300,zone:"A"},
+  {id:24, name:"San Nicolás Centro",      lat:25.7300,lng:-100.2950,zone:"C"},
+  {id:25, name:"La Sierra",              lat:25.6350,lng:-100.2800,zone:"B"},
+];
+
+// ══════════════════════════════════════════
+// STATE
+// ══════════════════════════════════════════
+const S = {
+  userColony: null,
+  colonies: {},
+  events: [],
+  map: null,
+  markers: {},
+  circles: {},
+};
+
+// Init colonies
+COLONIES_RAW.forEach(c => {
+  S.colonies[c.id] = {
+    ...c,
+    hasWater: Math.random() > 0.22,
+    lastChange: new Date(Date.now() - Math.random()*3600000),
+    estReturn: null,
+    estGone: null,
+    riskLevel: 0,
+  };
+});
+// Force some without water
+const noW = Object.keys(S.colonies).sort(()=>Math.random()-.5).slice(0,5);
+noW.forEach(id=>{
+  const c = S.colonies[id];
+  c.hasWater = false;
+  c.estReturn = new Date(Date.now() + (1 + Math.random()*3.5)*3600000);
+});
+
+// ══════════════════════════════════════════
+// UTILS
+// ══════════════════════════════════════════
+const fmt = d => d.toLocaleTimeString('es-MX',{hour:'2-digit',minute:'2-digit',hour12:true});
+const fmtRemain = future => {
+  const d = future - Date.now();
+  if(d<=0) return 'muy pronto';
+  const h = Math.floor(d/3600000), m = Math.floor((d%3600000)/60000);
+  return h>0 ? `~${h}h ${m}m` : `~${m} min`;
+};
+const haversine = (a,b,c,d) => {
+  const R=6371,f=(a-c)*Math.PI/180,g=(b-d)*Math.PI/180;
+  const x=Math.sin(f/2)**2+Math.cos(a*Math.PI/180)*Math.cos(c*Math.PI/180)*Math.sin(g/2)**2;
+  return R*2*Math.atan2(Math.sqrt(x),Math.sqrt(1-x));
+};
+const neighbors = (id, km=2.5) => COLONIES_RAW.filter(o=>{
+  if(o.id===id) return false;
+  const c=S.colonies[id]; return haversine(c.lat,c.lng,o.lat,o.lng)<=km;
+}).map(o=>o.id);
+
+// ══════════════════════════════════════════
+// MAP
+// ══════════════════════════════════════════
+function initMap(){
+  S.map = L.map('map',{center:[25.686,-100.316],zoom:12,zoomControl:false});
+
+  // Dark CartoDB tiles
+  L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png',{
+    attribution:'© CARTO',subdomains:'abcd',maxZoom:19
+  }).addTo(S.map);
+
+  L.control.zoom({position:'bottomright'}).addTo(S.map);
+
+  // Add colony markers + circles
+  COLONIES_RAW.forEach(c => drawColony(c.id));
+
+  // Click to pick colony
+  S.map.on('click', e => {
+    let closest=null, minD=Infinity;
+    COLONIES_RAW.forEach(c=>{
+      const d=haversine(e.latlng.lat,e.latlng.lng,c.lat,c.lng);
+      if(d<minD){minD=d;closest=c;}
+    });
+    if(closest && minD<3) showPopup(closest.id);
+  });
+}
+
+function colonyColor(id){
+  const c=S.colonies[id];
+  if(!c.hasWater) return {fill:'#E53935',glow:'rgba(229,57,53,.65)',border:'#C62828'};
+  if(c.riskLevel>0) return {fill:'#FF8C00',glow:'rgba(255,140,0,.65)',border:'#E65100'};
+  return {fill:'#38BE6C',glow:'rgba(56,190,108,.65)',border:'#2DA85A'};
+}
+
+function drawColony(id){
+  const c=S.colonies[id];
+  const isUser = id===S.userColony;
+  const col = colonyColor(id);
+  const sz = isUser ? 22 : 16;
+
+  if(S.markers[id]) S.map.removeLayer(S.markers[id]);
+  if(S.circles[id]) S.map.removeLayer(S.circles[id]);
+
+  // Translucent area circle
+  const circle = L.circle([c.lat,c.lng],{
+    radius:900,
+    color: col.border,
+    fillColor: col.fill,
+    fillOpacity: 0.12,
+    weight: 1,
+    opacity: 0.4,
+  }).addTo(S.map);
+  circle.on('click',()=>showPopup(id));
+  S.circles[id]=circle;
+
+  // Marker dot
+  const anim = isUser ? 'animation:pusr 1.8s infinite;' : '';
+  const icon = L.divIcon({
+    className:'',
+    html:`<div style="
+      width:${sz}px;height:${sz}px;border-radius:50%;
+      background:radial-gradient(circle,${col.fill}EE,${col.fill}88);
+      border:2px solid ${isUser?'#fff':col.border};
+      box-shadow:0 0 ${isUser?16:10}px ${col.glow},0 2px 6px rgba(0,0,0,.4);
+      cursor:pointer;${anim}transition:all .6s;
+    "></div>`,
+    iconSize:[sz,sz],iconAnchor:[sz/2,sz/2],
+  });
+
+  const mk = L.marker([c.lat,c.lng],{icon,zIndexOffset:isUser?100:0})
+    .addTo(S.map).on('click',()=>showPopup(id));
+  S.markers[id]=mk;
+}
+
+function showPopup(id){
+  const c=S.colonies[id];
+  const col=colonyColor(id);
+  const stTxt=c.hasWater?(c.riskLevel>0?'⚠️ Con agua / En riesgo':'💧 Agua disponible'):'🚫 Sin suministro';
+  const stColor=c.hasWater?(c.riskLevel>0?'#FF8C00':'#38BE6C'):'#FF6B6B';
+  const eta = !c.hasWater && c.estReturn
+    ? `<div style="color:var(--O);font-size:.76rem;margin-top:7px;">⏳ Regreso estimado: <strong>${fmt(c.estReturn)}</strong></div>`
+    : (c.hasWater && c.estGone
+      ? `<div style="color:var(--O);font-size:.76rem;margin-top:7px;">⚠️ Posible corte: <strong>${fmt(c.estGone)}</strong></div>`
+      : '');
+  const isMine=id===S.userColony;
+  const distText = S.userColony && !isMine
+    ? `<div style="color:var(--T3);font-size:.68rem;margin-top:5px;">📏 ${haversine(S.colonies[S.userColony].lat,S.colonies[S.userColony].lng,c.lat,c.lng).toFixed(1)} km de tu colonia</div>`
+    : '';
+
+  L.popup({closeButton:true})
+    .setLatLng([c.lat,c.lng])
+    .setContent(`
+      <div style="color:var(--T1);min-width:190px">
+        <div style="font-weight:800;font-size:.95rem;margin-bottom:5px;">
+          ${c.name}
+          ${isMine?'<span style="background:rgba(0,180,216,.2);color:var(--C);padding:1px 7px;border-radius:8px;font-size:.65rem;margin-left:5px;">MI COLONIA</span>':''}
+        </div>
+        <div style="color:${stColor};font-weight:600;font-size:.84rem;">${stTxt}</div>
+        <div style="color:var(--T3);font-size:.7rem;margin-top:5px;">Zona ${c.zone} · ${fmt(c.lastChange)}</div>
+        ${eta}${distText}
+        ${!isMine?`<button onclick="setColony(${id});S.map.closePopup()" style="margin-top:11px;width:100%;background:rgba(0,180,216,.18);border:1px solid rgba(0,180,216,.4);color:var(--C);padding:7px;border-radius:8px;cursor:pointer;font-size:.76rem;font-family:var(--FONT);font-weight:600;">📍 Esta es mi colonia</button>`:''}
+      </div>`)
+    .openOn(S.map);
+}
+
+// ══════════════════════════════════════════
+// LOCATION
+// ══════════════════════════════════════════
+function openModal(){document.getElementById('modal').classList.add('show')}
+function closeModal(){document.getElementById('modal').classList.remove('show')}
+function pickOnMap(){closeModal();notify('info','🗺️ Selecciona en el mapa','Toca cualquier colonia para establecerla como tu ubicación.',false)}
+function useGPS(){
+  if(!navigator.geolocation){selectFromList('1');closeModal();return;}
+  navigator.geolocation.getCurrentPosition(
+    pos=>{
+      let best=null,minD=Infinity;
+      COLONIES_RAW.forEach(c=>{
+        const d=haversine(pos.coords.latitude,pos.coords.longitude,c.lat,c.lng);
+        if(d<minD){minD=d;best=c;}
+      });
+      setColony(best.id);closeModal();
+    },
+    ()=>{
+      const rand=COLONIES_RAW[Math.floor(Math.random()*COLONIES_RAW.length)];
+      setColony(rand.id);closeModal();
+      notify('risk','📍 GPS no disponible','Se asignó la colonia más cercana disponible.',true);
+    }
+  );
+}
+function selectFromList(v){
+  if(!v) return;
+  setColony(parseInt(v));closeModal();
+}
+
+function setColony(id){
+  S.userColony=id;
+  const c=S.colonies[id];
+  document.getElementById('nav-colony').textContent=c.name;
+  COLONIES_RAW.forEach(x=>drawColony(x.id));
+  updateSC();
+  S.map.flyTo([c.lat,c.lng],14,{animate:true,duration:1.6});
+  const hw=c.hasWater;
+  notify(hw?'water-on':'water-off',
+    hw?'💧 Monitoreo activo':'🚫 Sin suministro',
+    hw?`Agua disponible en ${c.name} ahora mismo.`
+      :`${c.name} reporta corte${c.estReturn?`. Regreso estimado: ${fmt(c.estReturn)}`:'.'}.`,
+    true);
+  updateAll();
+}
+function centerUser(){
+  if(!S.userColony){openModal();return;}
+  const c=S.colonies[S.userColony];
+  S.map.flyTo([c.lat,c.lng],14,{animate:true,duration:1.2});
+}
+
+// ══════════════════════════════════════════
+// STATUS CARD
+// ══════════════════════════════════════════
+function updateSC(){
+  if(!S.userColony) return;
+  const c=S.colonies[S.userColony];
+  const sc=document.getElementById('sc');
+  const icon=document.getElementById('sc-icon');
+  const badge=document.getElementById('sc-badge');
+  const msg=document.getElementById('sc-msg');
+  const eta=document.getElementById('sc-eta');
+  const etaV=document.getElementById('sc-eta-val');
+
+  document.getElementById('sc-name').textContent=c.name;
+  document.getElementById('sc-time').textContent=`Zona ${c.zone} · act. ${fmt(c.lastChange)}`;
+
+  if(c.hasWater && c.riskLevel===0){
+    sc.className='sc on'; icon.className='sc-icon on'; icon.textContent='💧';
+    badge.className='sc-badge on'; badge.textContent='✓ AGUA DISPONIBLE';
+    msg.textContent=`El agua está disponible en ${c.name} desde las ${fmt(c.lastChange)}. Suministro normal.`;
+    eta.style.display='none';
+  } else if(c.hasWater && c.riskLevel>0){
+    sc.className='sc risk'; icon.className='sc-icon risk'; icon.textContent='⚠️';
+    badge.className='sc-badge risk'; badge.textContent='⚠ EN RIESGO';
+    msg.textContent=`Colonias cercanas reportan corte. Posible afectación${c.estGone?` alrededor de las ${fmt(c.estGone)}`:'  próximamente'}.`;
+    if(c.estGone){eta.style.display='block';eta.querySelector('.sc-eta-label').textContent='⚠️ Posible corte en:';etaV.className='sc-eta-val';etaV.textContent=fmtRemain(c.estGone);}
+    else eta.style.display='none';
+  } else {
+    sc.className='sc off'; icon.className='sc-icon off'; icon.textContent='🚫';
+    badge.className='sc-badge off'; badge.textContent='✗ SIN SUMINISTRO';
+    msg.textContent=`El agua se fue de ${c.name} a las ${fmt(c.lastChange)}. Recibirás una alerta cuando regrese.`;
+    if(c.estReturn){eta.style.display='block';eta.querySelector('.sc-eta-label').textContent='⏳ Estimado de regreso:';etaV.className='sc-eta-val green';etaV.textContent=fmtRemain(c.estReturn);}
+    else eta.style.display='none';
+  }
+}
+
+// ══════════════════════════════════════════
+// SIMULATION
+// ══════════════════════════════════════════
+function addEvent(type,id,msg){
+  const c=S.colonies[id];
+  S.events.unshift({type,name:c.name,zone:c.zone,msg,time:new Date()});
+  if(S.events.length>120) S.events.pop();
+}
+
+function triggerWater(id, hasWater){
+  const c=S.colonies[id];
+  const now=new Date();
+  c.hasWater=hasWater;
+  c.lastChange=now;
+  c.riskLevel=0;
+  c.estGone=null;
+
+  if(hasWater){
+    c.estReturn=null;
+    addEvent('on',id,`<strong>${c.name}</strong> — el agua regresó a las ${fmt(now)}`);
+    if(id===S.userColony){
+      notify('water-on','💧 ¡El agua regresó!',`El agua regresó a la colonia ${c.name} a las ${fmt(now)}.`,true);
+      spawnParticles('💧');
+    }
+  } else {
+    c.estReturn=new Date(now.getTime()+(1.2+Math.random()*3.8)*3600000);
+    addEvent('off',id,`<strong>${c.name}</strong> — se fue el agua a las ${fmt(now)}`);
+    if(id===S.userColony)
+      notify('water-off','🚫 ¡Se fue el agua!',`El agua se fue de la colonia ${c.name} a las ${fmt(now)}. Regreso estimado: ${fmt(c.estReturn)}.`,true);
+
+    // Propagation to neighbors
+    neighbors(id,2.5).forEach(nid=>{
+      const nb=S.colonies[nid];
+      if(nb.hasWater && Math.random()<0.5){
+        const delay=(6+Math.random()*24)*60000;
+        nb.riskLevel=2;
+        nb.estGone=new Date(now.getTime()+delay);
+        addEvent('risk',nid,`<strong>${nb.name}</strong> — riesgo de corte por afectación de ${c.name}`);
+        if(nid===S.userColony)
+          notify('risk','⚠️ Riesgo de Corte',`${nb.name} podría quedarse sin agua en ~${Math.round(delay/60000)} min por afectación en ${c.name}.`,true);
+        drawColony(nid);
+        setTimeout(()=>{if(nb.riskLevel>0&&nb.hasWater)triggerWater(nid,false);nb.riskLevel=0;},delay);
+      }
+    });
+  }
+  drawColony(id);
+  if(id===S.userColony) updateSC();
+  updateAll();
+}
+
+function simLoop(){
+  const ids=COLONIES_RAW.map(c=>c.id);
+  const id=ids[Math.floor(Math.random()*ids.length)];
+  const c=S.colonies[id];
+  if(!c.hasWater){if(Math.random()<0.65) triggerWater(id,true);}
+  else {if(Math.random()<0.28) triggerWater(id,false);}
+  setTimeout(simLoop, 25000+Math.random()*55000);
+}
+
+// ══════════════════════════════════════════
+// PANELS
+// ══════════════════════════════════════════
+function updateStats(){
+  const vs=Object.values(S.colonies);
+  const on=vs.filter(c=>c.hasWater&&c.riskLevel===0).length;
+  const off=vs.filter(c=>!c.hasWater).length;
+  const risk=vs.filter(c=>c.hasWater&&c.riskLevel>0).length;
+  ['st-on','ms-on'].forEach(id=>document.getElementById(id).textContent=on);
+  ['st-off','ms-off'].forEach(id=>document.getElementById(id).textContent=off);
+  ['st-risk','ms-risk'].forEach(id=>document.getElementById(id).textContent=risk);
+}
+
+function buildColoniesTab(){
+  const sorted=[...COLONIES_RAW].sort((a,b)=>{
+    if(a.id===S.userColony) return -1;
+    if(b.id===S.userColony) return 1;
+    const ca=S.colonies[a.id],cb=S.colonies[b.id];
+    if(!ca.hasWater&&cb.hasWater) return -1;
+    if(ca.hasWater&&!cb.hasWater) return 1;
+    return a.name.localeCompare(b.name);
+  });
+  return sorted.map(cd=>{
+    const c=S.colonies[cd.id];
+    const dc=c.hasWater?(c.riskLevel>0?'risk':'on'):'off';
+    const st=c.hasWater?(c.riskLevel>0?'⚠️ En riesgo':'Agua disponible'):`Sin suministro${c.estReturn?' · reg. '+fmt(c.estReturn):''}`;
+    const isU=cd.id===S.userColony;
+    return `<div class="ci ${isU?'user':''}" onclick="focusC(${cd.id})">
+      <div class="cidot ${dc}"></div>
+      <div style="flex:1;min-width:0">
+        <div class="ci-name">${cd.name}${isU?' <span style="color:var(--C);font-size:.6rem;">●</span>':''}</div>
+        <div class="ci-detail">${st}</div>
+      </div>
+      <div class="ci-zone">Z-${cd.zone}</div>
+    </div>`;
+  }).join('');
+}
+
+function buildEventsTab(){
+  if(!S.events.length) return '<div class="empty">📋 Sin eventos recientes</div>';
+  return S.events.slice(0,40).map(ev=>`
+    <div class="ei">
+      <div class="ei-icon ${ev.type==='on'?'on':ev.type==='off'?'off':'risk'}">${ev.type==='on'?'💧':ev.type==='off'?'🚫':'⚠️'}</div>
+      <div><div class="ei-msg">${ev.msg}</div><div class="ei-time">${fmt(ev.time)} · Zona ${ev.zone}</div></div>
+    </div>`).join('');
+}
+
+function buildNearbyTab(){
+  if(!S.userColony) return '<div class="empty">📍 Selecciona tu colonia primero</div>';
+  const nbs=neighbors(S.userColony,3.5).map(id=>({c:S.colonies[id],dist:haversine(S.colonies[S.userColony].lat,S.colonies[S.userColony].lng,S.colonies[id].lat,S.colonies[id].lng)}))
+    .sort((a,b)=>a.dist-b.dist);
+  if(!nbs.length) return '<div class="empty">Sin colonias en radio de 3.5km</div>';
+  return `<div style="padding:10px 16px;font-size:.68rem;color:var(--T3);background:rgba(0,180,216,.04);border-bottom:1px solid var(--BORDER);">📡 Colonias en radio de 3.5 km · afectan tu suministro</div>`+
+  nbs.map(({c,dist})=>{
+    const dc=c.hasWater?(c.riskLevel>0?'risk':'on'):'off';
+    const impact=!c.hasWater?'<span style="color:#FF6B6B;font-size:.68rem;">⚡ Influye en tu suministro</span>':
+      (c.riskLevel>0?'<span style="color:var(--O);font-size:.68rem;">⚠️ En riesgo</span>':'<span style="color:var(--T3);font-size:.68rem;">Estado normal</span>');
+    return `<div class="ci" onclick="focusC(${c.id})">
+      <div class="cidot ${dc}"></div>
+      <div style="flex:1;min-width:0"><div class="ci-name">${c.name}</div><div style="margin-top:2px">${impact}</div></div>
+      <div class="ci-zone">${dist.toFixed(1)}km</div>
+    </div>`;
+  }).join('');
+}
+
+function updateAll(){
+  updateStats();
+  document.getElementById('t-colonies').innerHTML=buildColoniesTab();
+  document.getElementById('t-events').innerHTML=buildEventsTab();
+  document.getElementById('t-nearby').innerHTML=buildNearbyTab();
+}
+
+function focusC(id){
+  const c=S.colonies[id];
+  S.map.flyTo([c.lat,c.lng],14,{animate:true,duration:1});
+  setTimeout(()=>showPopup(id),900);
+}
+
+// ══════════════════════════════════════════
+// NOTIFICATIONS
+// ══════════════════════════════════════════
+function notify(type,title,body,auto){
+  const ico=type==='water-on'?'💧':type==='water-off'?'🚫':type==='risk'?'⚠️':'ℹ️';
+  const cls=type==='water-on'?'water-on':type==='water-off'?'water-off':type==='risk'?'risk':'water-on';
+  const now=new Date().toLocaleTimeString('es-MX',{hour:'2-digit',minute:'2-digit',hour12:true});
+  const el=document.createElement('div');
+  el.className=`notif ${cls}`;
+  el.innerHTML=`<div class="n-ico">${ico}</div>
+    <div style="flex:1"><div class="n-title">${title}</div><div class="n-body">${body}</div><div class="n-time">${now} · GuardAgua IoT</div></div>
+    <div class="n-close" onclick="this.closest('.notif').remove()">✕</div>`;
+  document.getElementById('notifs').appendChild(el);
+  setTimeout(()=>el.classList.add('in'),30);
+  if(auto) setTimeout(()=>{el.classList.remove('in');setTimeout(()=>el.remove(),450)},6500);
+}
+
+// ══════════════════════════════════════════
+// PARTICLES
+// ══════════════════════════════════════════
+function spawnParticles(emoji){
+  for(let i=0;i<8;i++){
+    const p=document.createElement('div');
+    p.className='particle';
+    p.textContent=emoji;
+    p.style.left=(30+Math.random()*40)+'%';
+    p.style.top=(30+Math.random()*40)+'%';
+    p.style.animationDelay=(Math.random()*.5)+'s';
+    document.body.appendChild(p);
+    setTimeout(()=>p.remove(),1800);
+  }
+}
+
+// ══════════════════════════════════════════
+// TABS
+// ══════════════════════════════════════════
+function switchTab(name,el){
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('a'));
+  document.querySelectorAll('.tpane').forEach(p=>p.classList.remove('a'));
+  el.classList.add('a');
+  document.getElementById('t-'+name).classList.add('a');
+}
+
+// ══════════════════════════════════════════
+// MOBILE
+// ══════════════════════════════════════════
+function mTab(tab,el){
+  document.querySelectorAll('.bni').forEach(i=>i.classList.remove('a'));
+  el.classList.add('a');
+  const sheet=document.getElementById('msheet');
+  if(tab==='map'){sheet.style.display='none';return;}
+  sheet.style.display='block';
+  let html='';
+  if(tab==='status'){
+    if(!S.userColony){html='<div class="empty">📍 Selecciona tu colonia primero</div>';}
+    else {
+      const c=S.colonies[S.userColony];
+      const hw=c.hasWater;
+      const col=hw?(c.riskLevel>0?'var(--O)':'var(--G)'):'var(--R)';
+      html=`
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
+          <div><div style="font-weight:800;font-size:1rem">${c.name}</div><div style="color:var(--T3);font-size:.72rem">Tu colonia · Zona ${c.zone}</div></div>
+          <div style="font-size:2rem">${hw?'💧':'🚫'}</div>
+        </div>
+        <div style="background:${hw?'rgba(56,190,108,.12)':'rgba(229,57,53,.12)'};border:1px solid ${hw?'rgba(56,190,108,.3)':'rgba(229,57,53,.3)'};border-radius:11px;padding:14px;margin-bottom:12px">
+          <div style="color:${col};font-weight:700;font-size:.85rem">${hw?(c.riskLevel>0?'⚠ EN RIESGO':'✓ AGUA DISPONIBLE'):'✗ SIN SUMINISTRO'}</div>
+          <div style="color:var(--T2);font-size:.8rem;margin-top:5px">${hw?`Agua disponible desde las ${fmt(c.lastChange)}`:`Sin agua desde las ${fmt(c.lastChange)}`}</div>
+          ${!hw&&c.estReturn?`<div style="color:var(--O);font-size:.78rem;margin-top:4px">⏳ Regreso estimado: ${fmt(c.estReturn)}</div>`:''}
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px">
+          <div style="background:rgba(56,190,108,.08);border:1px solid rgba(56,190,108,.2);border-radius:9px;padding:10px;text-align:center">
+            <div style="font-family:var(--MONO);font-size:1.5rem;color:var(--G)">${Object.values(S.colonies).filter(c=>c.hasWater&&c.riskLevel===0).length}</div>
+            <div style="font-size:.6rem;color:var(--T3);margin-top:3px">CON AGUA</div>
+          </div>
+          <div style="background:rgba(229,57,53,.08);border:1px solid rgba(229,57,53,.2);border-radius:9px;padding:10px;text-align:center">
+            <div style="font-family:var(--MONO);font-size:1.5rem;color:var(--R)">${Object.values(S.colonies).filter(c=>!c.hasWater).length}</div>
+            <div style="font-size:.6rem;color:var(--T3);margin-top:3px">SIN AGUA</div>
+          </div>
+          <div style="background:rgba(255,140,0,.08);border:1px solid rgba(255,140,0,.2);border-radius:9px;padding:10px;text-align:center">
+            <div style="font-family:var(--MONO);font-size:1.5rem;color:var(--O)">${Object.values(S.colonies).filter(c=>c.hasWater&&c.riskLevel>0).length}</div>
+            <div style="font-size:.6rem;color:var(--T3);margin-top:3px">EN RIESGO</div>
+          </div>
+        </div>`;
+    }
+  } else if(tab==='events'){
+    html=`<div style="font-weight:700;font-size:.9rem;margin-bottom:12px">📋 Eventos Recientes</div>`+buildEventsTab();
+  } else if(tab==='nearby'){
+    html=`<div style="font-weight:700;font-size:.9rem;margin-bottom:12px">📡 Colonias Cercanas</div>`+buildNearbyTab();
+  }
+  sheet.innerHTML=html;
+}
+
+// ══════════════════════════════════════════
+// CLOCK
+// ══════════════════════════════════════════
+function tickClock(){
+  document.getElementById('nav-clock').textContent=
+    new Date().toLocaleTimeString('es-MX',{hour:'2-digit',minute:'2-digit',second:'2-digit',hour12:true});
+}
+
+// ══════════════════════════════════════════
+// SELECT POPULATE
+// ══════════════════════════════════════════
+function populateSelect(){
+  const sel=document.getElementById('csel');
+  [...COLONIES_RAW].sort((a,b)=>a.name.localeCompare(b.name)).forEach(c=>{
+    const o=document.createElement('option');
+    o.value=c.id; o.textContent=c.name;
+    sel.appendChild(o);
+  });
+}
+
+// ══════════════════════════════════════════
+// SPLASH STEPS
+// ══════════════════════════════════════════
+const STEPS=['Conectando con sensores IoT...','Cargando red hídrica...','Procesando reportes...','¡Listo!'];
+let si=0;
+function nextStep(){
+  if(si>=STEPS.length) return;
+  const el=document.getElementById('s-steps');
+  el.textContent=STEPS[si++];
+  if(si<STEPS.length) setTimeout(nextStep,600);
+}
+
+// ══════════════════════════════════════════
+// BOOT
+// ══════════════════════════════════════════
+window.addEventListener('load',()=>{
+  populateSelect();
+  setTimeout(nextStep,400);
+
+  setTimeout(()=>{
+    document.getElementById('splash').classList.add('out');
+    setTimeout(()=>{
+      document.getElementById('splash').style.display='none';
+      const app=document.getElementById('app');
+      app.classList.add('on');
+      initMap();
+      updateAll();
+      setTimeout(openModal,600);
+      setTimeout(simLoop,8000);
+      tickClock();
+      setInterval(tickClock,1000);
+      setInterval(updateAll,12000);
+      setInterval(updateSC,6000);
+    },900);
+  },3000);
+});
+
+// Expose setColony globally (used in popup HTML)
+window.setColony=setColony;
+window.S=S;
+</script>
+</body>
+</html>
