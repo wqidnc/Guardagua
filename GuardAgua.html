@@ -354,6 +354,176 @@ html,body{height:100%;overflow:hidden;font-family:var(--FONT);background:var(--B
   0%{box-shadow:0 0 0 0 rgba(var(--C-RGB),.8),0 0 14px rgba(var(--G-RGB),.6)}
   100%{box-shadow:0 0 0 20px rgba(var(--C-RGB),0),0 0 14px rgba(var(--G-RGB),.6)}
 }
+
+/* ── SECTOR POLÍTICO PANEL ─────────────────────────── */
+#polpanel{
+  position:fixed;inset:0;z-index:900;
+  background:rgba(0,0,0,.7);backdrop-filter:blur(16px);
+  display:flex;align-items:center;justify-content:center;
+  opacity:0;pointer-events:none;transition:opacity .4s;
+}
+#polpanel.show{opacity:1;pointer-events:all}
+.polbox{
+  background:linear-gradient(145deg,#142233,#0a1620);
+  border:1px solid rgba(79,179,191,.25);border-radius:24px;
+  padding:28px 26px;width:94%;max-width:560px;
+  max-height:90vh;overflow-y:auto;
+  box-shadow:0 0 0 1px rgba(79,179,191,.1),0 32px 90px rgba(0,0,0,.7),0 0 80px rgba(79,179,191,.08);
+  transform:translateY(40px) scale(.96);transition:transform .45s cubic-bezier(.175,.885,.32,1.275);
+  scrollbar-width:thin;scrollbar-color:var(--P) transparent;
+  position:relative;overflow:hidden;
+}
+#polpanel.show .polbox{transform:translateY(0) scale(1)}
+.polbox::before{
+  content:'';position:absolute;top:-60%;left:-40%;width:180%;height:180%;
+  background:radial-gradient(ellipse at 30% 20%,rgba(79,179,191,.07) 0%,transparent 60%),
+             radial-gradient(ellipse at 80% 80%,rgba(93,162,113,.05) 0%,transparent 50%);
+  pointer-events:none;animation:bgShift 8s ease-in-out infinite alternate;
+}
+@keyframes bgShift{0%{transform:translate(0,0)}100%{transform:translate(3%,2%)}}
+.polbox::-webkit-scrollbar{width:3px}
+.polbox::-webkit-scrollbar-thumb{background:var(--P);border-radius:2px}
+.pol-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:4px;position:relative}
+.pol-title{font-size:1.4rem;font-weight:900;letter-spacing:-.5px;display:flex;align-items:center;gap:10px}
+.pol-title em{font-style:normal;color:var(--C);text-shadow:0 0 20px rgba(var(--C-RGB),.5)}
+.pol-title-icon{
+  font-size:1.5rem;animation:spinPulse 4s ease-in-out infinite;
+  filter:drop-shadow(0 0 8px rgba(79,179,191,.6));
+}
+@keyframes spinPulse{0%,100%{transform:rotate(0deg) scale(1)}50%{transform:rotate(8deg) scale(1.15)}}
+.pol-close{
+  cursor:pointer;font-size:1.1rem;color:var(--T3);transition:all .2s;
+  padding:6px 8px;border-radius:9px;border:1px solid transparent;
+  line-height:1;
+}
+.pol-close:hover{color:var(--T1);background:rgba(255,255,255,.06);border-color:var(--BORDER);transform:rotate(90deg)}
+.pol-subtitle{
+  font-size:.68rem;letter-spacing:3px;text-transform:uppercase;
+  background:linear-gradient(90deg,var(--C),var(--G));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+  margin-bottom:16px;opacity:.9;
+}
+.pol-intro{
+  font-size:.81rem;color:var(--T2);line-height:1.65;margin-bottom:20px;
+  padding:13px 15px;
+  background:linear-gradient(135deg,rgba(var(--C-RGB),.08),rgba(var(--G-RGB),.04));
+  border-left:3px solid var(--C);border-radius:0 12px 12px 0;
+  position:relative;overflow:hidden;
+}
+.pol-intro::after{
+  content:'ODS';position:absolute;right:-8px;bottom:-12px;
+  font-size:3.5rem;font-weight:900;color:rgba(var(--C-RGB),.04);
+  letter-spacing:-2px;pointer-events:none;
+}
+.ods-grid{display:flex;flex-direction:column;gap:10px}
+
+/* ODS cards con animación de entrada escalonada */
+.ods-card{
+  background:rgba(255,255,255,.025);
+  border:1px solid rgba(255,255,255,.06);
+  border-radius:16px;overflow:hidden;
+  transition:border-color .25s,background .25s,box-shadow .25s,transform .2s;
+  opacity:0;transform:translateX(-24px);
+  animation:slideInOds .5s ease forwards;
+  position:relative;
+}
+.ods-card:nth-child(1){animation-delay:.05s}
+.ods-card:nth-child(2){animation-delay:.12s}
+.ods-card:nth-child(3){animation-delay:.19s}
+.ods-card:nth-child(4){animation-delay:.26s}
+.ods-card:nth-child(5){animation-delay:.33s}
+.ods-card:nth-child(6){animation-delay:.40s}
+@keyframes slideInOds{to{opacity:1;transform:translateX(0)}}
+.ods-card:hover{
+  background:rgba(var(--C-RGB),.07);
+  border-color:rgba(var(--C-RGB),.25);
+  transform:translateX(3px);
+  box-shadow:0 4px 20px rgba(0,0,0,.3),-3px 0 0 var(--C);
+}
+.ods-card.open{
+  border-color:rgba(var(--C-RGB),.3);
+  box-shadow:0 6px 30px rgba(0,0,0,.35),inset 0 1px 0 rgba(var(--C-RGB),.15);
+}
+/* glow bar a la izquierda según color ODS */
+.ods-card::before{
+  content:'';position:absolute;left:0;top:0;bottom:0;width:3px;
+  background:var(--ods-color,var(--C));
+  opacity:0;transition:opacity .25s;border-radius:3px 0 0 3px;
+}
+.ods-card:hover::before,.ods-card.open::before{opacity:1}
+
+.ods-head{
+  display:flex;align-items:center;gap:12px;padding:13px 15px;
+  cursor:pointer;user-select:none;
+}
+.ods-counter{
+  font-size:.58rem;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;
+  color:var(--T3);font-family:var(--MONO);flex-shrink:0;width:18px;text-align:right;
+}
+.ods-num{
+  width:38px;height:38px;border-radius:11px;
+  display:flex;align-items:center;justify-content:center;
+  font-size:.85rem;font-weight:900;color:#fff;flex-shrink:0;
+  box-shadow:0 3px 12px rgba(0,0,0,.35);
+  transition:transform .2s,box-shadow .2s;
+  position:relative;overflow:hidden;
+}
+.ods-num::after{
+  content:'';position:absolute;inset:0;
+  background:linear-gradient(135deg,rgba(255,255,255,.2),transparent);
+}
+.ods-card:hover .ods-num,.ods-card.open .ods-num{
+  transform:scale(1.1) rotate(-3deg);
+  box-shadow:0 6px 20px rgba(0,0,0,.4),0 0 15px var(--ods-color,rgba(var(--C-RGB),.4));
+}
+.ods-name{font-size:.85rem;font-weight:700;flex:1;line-height:1.3}
+.ods-chevron{
+  color:var(--T3);font-size:.65rem;transition:transform .3s cubic-bezier(.68,-.55,.265,1.55);
+  flex-shrink:0;width:18px;text-align:center;
+}
+.ods-card.open .ods-chevron{transform:rotate(180deg);color:var(--C)}
+
+.ods-body{
+  max-height:0;overflow:hidden;
+  transition:max-height .4s cubic-bezier(.4,0,.2,1),padding .3s;
+  padding:0 15px 0 15px;
+}
+.ods-card.open .ods-body{max-height:500px;padding:0 15px 16px 15px}
+.ods-body-inner{
+  padding-top:10px;
+  border-top:1px solid rgba(255,255,255,.06);
+}
+.ods-body p{font-size:.79rem;color:var(--T2);line-height:1.65;margin-bottom:8px}
+.ods-body p:last-child{margin-bottom:0}
+.ods-rel{
+  background:linear-gradient(135deg,rgba(var(--C-RGB),.08),rgba(var(--G-RGB),.04));
+  border-left:2px solid var(--C);
+  border-radius:0 10px 10px 0;padding:10px 13px;margin-top:10px;
+  font-size:.77rem;color:var(--T2);line-height:1.6;
+  position:relative;
+}
+.ods-rel-icon{
+  position:absolute;right:10px;top:50%;transform:translateY(-50%);
+  font-size:1.4rem;opacity:.15;
+}
+
+.pol-sep{height:1px;background:linear-gradient(90deg,transparent,var(--BORDER),transparent);margin:18px 0}
+.pol-footer{
+  font-size:.69rem;color:var(--T3);text-align:center;
+  display:flex;align-items:center;justify-content:center;gap:8px;
+}
+.pol-footer::before,.pol-footer::after{content:'';flex:1;height:1px;background:var(--BORDER)}
+
+.nav-gear{
+  background:var(--GLASS);border:1px solid var(--BORDER);
+  border-radius:10px;padding:6px 10px;cursor:pointer;
+  font-size:.88rem;transition:all .25s;color:var(--T2);
+  display:flex;align-items:center;
+}
+.nav-gear:hover{
+  background:rgba(var(--C-RGB),.14);border-color:var(--C);color:var(--C);
+  transform:rotate(45deg);box-shadow:0 0 14px rgba(var(--C-RGB),.25);
+}
 </style>
 </head>
 <body>
@@ -412,6 +582,7 @@ html,body{height:100%;overflow:hidden;font-family:var(--FONT);background:var(--B
         <div class="dot"></div>
         <span id="nav-colony">Seleccionar colonia</span>
       </div>
+      <div class="nav-gear" onclick="openPolPanel()" title="Sector Político / Sobre el Proyecto">⚙️</div>
       <div class="nav-clock" id="nav-clock">00:00:00</div>
     </div>
   </nav>
@@ -520,6 +691,141 @@ html,body{height:100%;overflow:hidden;font-family:var(--FONT);background:var(--B
 <div id="msheet"></div>
 <div id="notifs"></div>
 
+<!-- ╔══ SECTOR POLÍTICO PANEL ══╗ -->
+<div id="polpanel" onclick="closePolPanel(event)">
+  <div class="polbox">
+    <div class="pol-header">
+      <div>
+        <div class="pol-title">
+          <span class="pol-title-icon">🏛️</span>
+          Sector <em>Político</em>
+        </div>
+        <div class="pol-subtitle">Objetivos de Desarrollo Sostenible · Agenda ONU 2030</div>
+      </div>
+      <div class="pol-close" onclick="closePolPanelDirect()">✕</div>
+    </div>
+    <div class="pol-intro">
+      GuardAgua se alinea con los <strong>Objetivos de Desarrollo Sostenible</strong> de la ONU,
+      contribuyendo a una gestión hídrica responsable en Aguascalientes y sus municipios:
+      ciudad capital, San Francisco de los Romo, Jesús María y El Llano.
+    </div>
+
+    <div class="ods-grid">
+
+      <div class="ods-card" id="ods10" style="--ods-color:#E5195D">
+        <div class="ods-head" onclick="toggleOds('ods10')">
+          <div class="ods-counter">1.</div>
+          <div class="ods-num" style="background:#E5195D;">10</div>
+          <div class="ods-name">Reducción de las Desigualdades</div>
+          <div class="ods-chevron">▼</div>
+        </div>
+        <div class="ods-body">
+          <div class="ods-body-inner">
+            <p>Busca garantizar que nadie se quede atrás, promoviendo la inclusión social, económica y política de todas las personas, independientemente de su edad, sexo, discapacidad, raza, etnia, origen, religión o situación económica.</p>
+            <div class="ods-rel">
+              <span class="ods-rel-icon">⚖️</span>
+              📌 <strong>Relación con el proyecto:</strong> Promueve que todos tengan un consumo responsable y se pongan al corriente con los pagos de servicio para evitar discrepancias. Busca que toda la comunidad esté contenta con el acceso equitativo al agua.
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="ods-card" id="ods11" style="--ods-color:#F09600">
+        <div class="ods-head" onclick="toggleOds('ods11')">
+          <div class="ods-counter">2.</div>
+          <div class="ods-num" style="background:#F09600;">11</div>
+          <div class="ods-name">Ciudades y Comunidades Sostenibles</div>
+          <div class="ods-chevron">▼</div>
+        </div>
+        <div class="ods-body">
+          <div class="ods-body-inner">
+            <p>Tiene como propósito lograr que las ciudades y comunidades sean más sostenibles, seguras y eficientes para todos sus habitantes.</p>
+            <div class="ods-rel">
+              <span class="ods-rel-icon">🏙️</span>
+              📌 <strong>Relación con el proyecto:</strong> Mejora la calidad de vida mediante tecnología IoT para resolver un problema que afecta directamente a las colonias de Aguascalientes, San Francisco de los Romo, Jesús María y El Llano.
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="ods-card" id="ods12" style="--ods-color:#BF8B2E">
+        <div class="ods-head" onclick="toggleOds('ods12')">
+          <div class="ods-counter">3.</div>
+          <div class="ods-num" style="background:#BF8B2E;">12</div>
+          <div class="ods-name">Producción y Consumo Responsables</div>
+          <div class="ods-chevron">▼</div>
+        </div>
+        <div class="ods-body">
+          <div class="ods-body-inner">
+            <p>Busca desvincular el crecimiento económico de la degradación ambiental. Sus metas incluyen la gestión sostenible de recursos naturales, prevención de residuos mediante reducción, reciclado y reutilización.</p>
+            <div class="ods-rel">
+              <span class="ods-rel-icon">♻️</span>
+              📌 <strong>Relación con el proyecto:</strong> Incentiva a la comunidad a estar atenta al servicio intermitente de agua para evitar desperdiciar agua que no se está consumiendo activamente.
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="ods-card" id="ods13" style="--ods-color:#3F7E44">
+        <div class="ods-head" onclick="toggleOds('ods13')">
+          <div class="ods-counter">4.</div>
+          <div class="ods-num" style="background:#3F7E44;">13</div>
+          <div class="ods-name">Acción por el Clima</div>
+          <div class="ods-chevron">▼</div>
+        </div>
+        <div class="ods-body">
+          <div class="ods-body-inner">
+            <p>Enfocado en adoptar medidas urgentes para combatir el cambio climático. Busca fortalecer la resiliencia ante desastres, integrar medidas climáticas en políticas nacionales y mejorar la educación ambiental y la sensibilización ciudadana.</p>
+            <div class="ods-rel">
+              <span class="ods-rel-icon">🌍</span>
+              📌 <strong>Relación con el proyecto:</strong> Promueve el uso consciente del agua para reducir el desperdicio y fomentar el uso responsable en toda la comunidad de los municipios.
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="ods-card" id="ods16" style="--ods-color:#00689D">
+        <div class="ods-head" onclick="toggleOds('ods16')">
+          <div class="ods-counter">5.</div>
+          <div class="ods-num" style="background:#00689D;">16</div>
+          <div class="ods-name">Paz, Justicia e Instituciones Sólidas</div>
+          <div class="ods-chevron">▼</div>
+        </div>
+        <div class="ods-body">
+          <div class="ods-body-inner">
+            <p>Busca construir instituciones más transparentes, responsables y cercanas a las personas, promoviendo el acceso a la justicia y la rendición de cuentas.</p>
+            <div class="ods-rel">
+              <span class="ods-rel-icon">🕊️</span>
+              📌 <strong>Relación con el proyecto:</strong> Permite que la población tenga información clara y accesible sobre el suministro de agua, evitando la desinformación y conflictos derivados de la falta de comunicación entre autoridades y vecinos.
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="ods-card" id="ods17" style="--ods-color:#19486A">
+        <div class="ods-head" onclick="toggleOds('ods17')">
+          <div class="ods-counter">6.</div>
+          <div class="ods-num" style="background:#19486A;">17</div>
+          <div class="ods-name">Alianzas para Lograr los Objetivos</div>
+          <div class="ods-chevron">▼</div>
+        </div>
+        <div class="ods-body">
+          <div class="ods-body-inner">
+            <p>Requiere la colaboración entre diferentes sectores para funcionar de manera efectiva: autoridades del servicio de agua, desarrolladores de tecnología, escuelas, organizaciones y la comunidad en general.</p>
+            <div class="ods-rel">
+              <span class="ods-rel-icon">🤝</span>
+              📌 <strong>Relación con el proyecto:</strong> Estas alianzas permiten compartir información, recursos y apoyo para resolver el problema del desperdicio de agua. La participación de la comunidad en los cuatro municipios es fundamental.
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+    <div class="pol-sep"></div>
+    <div class="pol-footer">GuardAgua · Aguascalientes · San Francisco de los Romo · Jesús María · El Llano · Agenda ONU 2030</div>
+  </div>
+</div>
+
 <script>
 // ══════════════════════════════════════════
 // DATA
@@ -564,7 +870,38 @@ const COLONIES_RAW = [
 {id:37,name:"La Soledad",lat:21.8850,lng:-102.3380,zone:"Poniente"},
 {id:38,name:"Versalles",lat:21.8740,lng:-102.3020,zone:"Centro"},
 {id:39,name:"Panorama",lat:21.8880,lng:-102.3040,zone:"Centro"},
-{id:40,name:"Colinas del Río",lat:21.9100,lng:-102.3400,zone:"Poniente"}
+{id:40,name:"Colinas del Río",lat:21.9100,lng:-102.3400,zone:"Poniente"},
+// ── San Francisco de los Romo (San Pancho) ──
+{id:41,name:"Centro — San Pancho",lat:21.8350,lng:-102.4080,zone:"San Francisco de los Romo"},
+{id:42,name:"El Sauz",lat:21.8280,lng:-102.4150,zone:"San Francisco de los Romo"},
+{id:43,name:"La Palma",lat:21.8420,lng:-102.4010,zone:"San Francisco de los Romo"},
+{id:44,name:"Lomas de San Francisco",lat:21.8470,lng:-102.4090,zone:"San Francisco de los Romo"},
+{id:45,name:"Villas de San Francisco",lat:21.8390,lng:-102.3950,zone:"San Francisco de los Romo"},
+{id:46,name:"El Refugio",lat:21.8310,lng:-102.4050,zone:"San Francisco de los Romo"},
+{id:47,name:"La Loma",lat:21.8450,lng:-102.4130,zone:"San Francisco de los Romo"},
+{id:48,name:"Jardines de San Francisco",lat:21.8360,lng:-102.3990,zone:"San Francisco de los Romo"},
+{id:49,name:"Nueva Esperanza",lat:21.8300,lng:-102.4110,zone:"San Francisco de los Romo"},
+{id:50,name:"Los Mezquites",lat:21.8490,lng:-102.4060,zone:"San Francisco de los Romo"},
+// ── Jesús María ──
+{id:51,name:"Centro — Jesús María",lat:21.9648,lng:-102.3432,zone:"Jesús María"},
+{id:52,name:"Las Margaritas",lat:21.9580,lng:-102.3370,zone:"Jesús María"},
+{id:53,name:"El Encino",lat:21.9700,lng:-102.3500,zone:"Jesús María"},
+{id:54,name:"Paseos del Vergel",lat:21.9720,lng:-102.3290,zone:"Jesús María"},
+{id:55,name:"Lomas de Jesús María",lat:21.9640,lng:-102.3550,zone:"Jesús María"},
+{id:56,name:"San Antonio",lat:21.9560,lng:-102.3480,zone:"Jesús María"},
+{id:57,name:"El Vergel",lat:21.9780,lng:-102.3410,zone:"Jesús María"},
+{id:58,name:"Las Trojes",lat:21.9510,lng:-102.3320,zone:"Jesús María"},
+{id:59,name:"La Joya",lat:21.9690,lng:-102.3600,zone:"Jesús María"},
+{id:60,name:"Villas del Sol",lat:21.9620,lng:-102.3250,zone:"Jesús María"},
+// ── El Llano ──
+{id:61,name:"Cabecera — El Llano",lat:21.9210,lng:-102.0190,zone:"El Llano"},
+{id:62,name:"La Loma del Trigo",lat:21.9150,lng:-102.0140,zone:"El Llano"},
+{id:63,name:"Los Arquitos",lat:21.9280,lng:-102.0230,zone:"El Llano"},
+{id:64,name:"El Potrero",lat:21.9100,lng:-102.0270,zone:"El Llano"},
+{id:65,name:"Las Pilas",lat:21.9330,lng:-102.0160,zone:"El Llano"},
+{id:66,name:"Rancho Nuevo",lat:21.9060,lng:-102.0100,zone:"El Llano"},
+{id:67,name:"San José de la Montaña",lat:21.9400,lng:-102.0300,zone:"El Llano"},
+{id:68,name:"El Mezquite",lat:21.9190,lng:-102.0350,zone:"El Llano"}
 ];
 
 // ══════════════════════════════════════════
@@ -1057,6 +1394,28 @@ window.addEventListener('load',()=>{
 window.setColony=setColony;
 window.reportWater=reportWater;
 window.S=S;
+
+// ══════════════════════════════════════════
+// SECTOR POLÍTICO
+// ══════════════════════════════════════════
+function openPolPanel(){
+  document.getElementById('polpanel').classList.add('show');
+}
+function closePolPanelDirect(){
+  document.getElementById('polpanel').classList.remove('show');
+}
+function closePolPanel(e){
+  if(e.target===document.getElementById('polpanel'))
+    document.getElementById('polpanel').classList.remove('show');
+}
+function toggleOds(id){
+  const card=document.getElementById(id);
+  card.classList.toggle('open');
+}
+window.openPolPanel=openPolPanel;
+window.closePolPanelDirect=closePolPanelDirect;
+window.closePolPanel=closePolPanel;
+window.toggleOds=toggleOds;
 </script>
 </body>
 </html>
