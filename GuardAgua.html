@@ -10,7 +10,6 @@
 <style>
 /* ════════════════════════════════════════
    PALETA NATURAL  ·  GuardAgua
-   Azules de océano, verde hoja, terracota y ámbar.
    ════════════════════════════════════════ */
 :root{
   --P:#2C6E8F; --P2:#3A7FA0; --C:#4FB3BF; --C2:#3D9AA6;
@@ -24,8 +23,6 @@
   --MONO:'DM Mono',monospace;
   --FONT:'Outfit',-apple-system,sans-serif;
   --SHADOW: 0 8px 40px rgba(0,0,0,.45);
-
-  /* glow helpers (rgb) */
   --G-RGB:93,162,113;
   --R-RGB:197,107,92;
   --C-RGB:79,179,191;
@@ -34,88 +31,156 @@
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 html,body{height:100%;overflow:hidden;font-family:var(--FONT);background:var(--BG);color:var(--T1)}
 
-/* ── SPLASH ─────────────────────────── */
+/* ══ SPLASH ══ */
 #splash{
   position:fixed;inset:0;z-index:9999;
   background:linear-gradient(155deg,#0F1E29 0%,#1E4256 55%,#143041 100%);
-  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:0;
-  transition:opacity .9s ease,transform .9s ease;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  transition:opacity 1.1s cubic-bezier(.4,0,.2,1),transform 1.1s cubic-bezier(.4,0,.2,1);
+  overflow:hidden;
 }
-#splash.out{opacity:0;transform:scale(1.06);pointer-events:none}
-.s-logo{animation:floatY 3s ease-in-out infinite}
+#splash.out{opacity:0;transform:scale(1.08) translateY(-20px);pointer-events:none}
+
+/* Partículas de fondo en splash */
+.splash-bg-particles{position:absolute;inset:0;overflow:hidden;pointer-events:none}
+.sbp{position:absolute;border-radius:50%;animation:sbpFloat linear infinite}
+@keyframes sbpFloat{
+  0%{transform:translateY(110vh) scale(0) rotate(0deg);opacity:0}
+  10%{opacity:.6}
+  90%{opacity:.4}
+  100%{transform:translateY(-20vh) scale(1.2) rotate(720deg);opacity:0}
+}
+
+.s-logo{animation:floatY 3s ease-in-out infinite;position:relative;z-index:1}
 @keyframes floatY{0%,100%{transform:translateY(0)}50%{transform:translateY(-14px)}}
-.s-rings{position:relative;width:160px;height:160px;display:flex;align-items:center;justify-content:center;margin-bottom:28px}
+
+.s-rings{position:relative;width:180px;height:180px;display:flex;align-items:center;justify-content:center;margin-bottom:28px}
 .s-ring{
-  position:absolute;border-radius:50%;border:1px solid rgba(var(--C-RGB),.25);
-  animation:expand 3s ease-out infinite;
+  position:absolute;border-radius:50%;
+  border:1px solid rgba(var(--C-RGB),.3);
+  animation:expandRing 3s ease-out infinite;
 }
 .s-ring:nth-child(1){width:96px;height:96px;animation-delay:0s}
-.s-ring:nth-child(2){width:128px;height:128px;animation-delay:.6s}
-.s-ring:nth-child(3){width:160px;height:160px;animation-delay:1.2s}
-@keyframes expand{0%{opacity:.8;transform:scale(.85)}100%{opacity:0;transform:scale(1.1)}}
-.s-logo-img{width:76px;height:76px;border-radius:18px;object-fit:cover;box-shadow:0 8px 30px rgba(0,0,0,.4)}
-.s-title{font-size:clamp(2.2rem,6vw,3.4rem);font-weight:900;letter-spacing:-1.5px;line-height:1}
-.s-title em{font-style:normal;color:var(--C)}
-.s-sub{font-size:.72rem;letter-spacing:4px;text-transform:uppercase;color:var(--C);margin:10px 0 40px;opacity:.85}
-.s-bar{width:220px;height:3px;background:rgba(255,255,255,.08);border-radius:2px;overflow:hidden}
-.s-bar-fill{height:100%;background:linear-gradient(90deg,var(--C),var(--G));border-radius:2px;animation:fill 2.5s ease forwards}
-@keyframes fill{from{width:0}to{width:100%}}
-.s-steps{margin-top:20px;font-size:.72rem;font-family:var(--MONO);color:var(--T3);height:16px;overflow:hidden}
+.s-ring:nth-child(2){width:132px;height:132px;animation-delay:.7s;border-color:rgba(var(--G-RGB),.25)}
+.s-ring:nth-child(3){width:168px;height:168px;animation-delay:1.4s;border-color:rgba(var(--C-RGB),.15)}
+@keyframes expandRing{
+  0%{opacity:.9;transform:scale(.7);filter:blur(0)}
+  100%{opacity:0;transform:scale(1.15);filter:blur(2px)}
+}
 
-/* ── MODAL ─────────────────────────── */
+.s-logo-inner{
+  width:82px;height:82px;border-radius:22px;
+  background:linear-gradient(135deg,rgba(var(--C-RGB),.2),rgba(var(--G-RGB),.15));
+  border:1.5px solid rgba(var(--C-RGB),.4);
+  display:flex;align-items:center;justify-content:center;
+  font-size:2.4rem;
+  box-shadow:0 0 0 8px rgba(var(--C-RGB),.06),0 8px 40px rgba(0,0,0,.5),inset 0 1px 0 rgba(255,255,255,.1);
+  position:relative;overflow:hidden;
+}
+.s-logo-inner::after{
+  content:'';position:absolute;inset:0;
+  background:linear-gradient(135deg,rgba(255,255,255,.12),transparent 50%);
+}
+.s-logo-shimmer{
+  position:absolute;top:-50%;left:-60%;width:60%;height:200%;
+  background:linear-gradient(105deg,transparent,rgba(255,255,255,.15),transparent);
+  animation:shimmer 2.5s ease-in-out infinite;
+}
+@keyframes shimmer{0%{left:-60%}100%{left:130%}}
+
+.s-title{font-size:clamp(2.4rem,6vw,3.6rem);font-weight:900;letter-spacing:-2px;line-height:1;text-align:center}
+.s-title em{font-style:normal;color:var(--C);text-shadow:0 0 30px rgba(var(--C-RGB),.5)}
+.s-sub{font-size:.72rem;letter-spacing:5px;text-transform:uppercase;color:var(--C);margin:12px 0 44px;opacity:.8}
+.s-bar{
+  width:240px;height:3px;
+  background:rgba(255,255,255,.07);border-radius:2px;overflow:hidden;
+  position:relative;
+}
+.s-bar::after{
+  content:'';position:absolute;inset:0;
+  background:linear-gradient(90deg,rgba(255,255,255,0),rgba(255,255,255,.3),rgba(255,255,255,0));
+  animation:barGlow 1.5s linear infinite;
+}
+@keyframes barGlow{0%{transform:translateX(-100%)}100%{transform:translateX(200%)}}
+.s-bar-fill{height:100%;background:linear-gradient(90deg,var(--C),var(--G),var(--C));background-size:200%;border-radius:2px;animation:fill 2.8s cubic-bezier(.4,0,.2,1) forwards,barShift 1.5s linear infinite}
+@keyframes fill{from{width:0}to{width:100%}}
+@keyframes barShift{0%{background-position:0%}100%{background-position:200%}}
+.s-steps{margin-top:18px;font-size:.72rem;font-family:var(--MONO);color:var(--T3);height:18px;overflow:hidden;text-align:center}
+.s-step-text{animation:stepIn .35s ease forwards}
+@keyframes stepIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+
+/* ══ MODAL ══ */
 #modal{
   position:fixed;inset:0;z-index:800;
-  background:rgba(0,0,0,.6);backdrop-filter:blur(12px);
+  background:rgba(0,0,0,.65);backdrop-filter:blur(16px);
   display:flex;align-items:center;justify-content:center;
-  opacity:0;pointer-events:none;transition:opacity .35s;
+  opacity:0;pointer-events:none;transition:opacity .4s;
 }
 #modal.show{opacity:1;pointer-events:all}
 .mbox{
   background:linear-gradient(145deg,#1A3344,#0F1E29);
-  border:1px solid var(--BORDER);border-radius:22px;
+  border:1px solid var(--BORDER);border-radius:24px;
   padding:32px 28px;width:92%;max-width:460px;
-  box-shadow:0 24px 80px rgba(0,0,0,.55);
-  transform:translateY(24px);transition:transform .35s;
+  box-shadow:0 24px 80px rgba(0,0,0,.6),0 0 0 1px rgba(var(--C-RGB),.08);
+  transform:translateY(32px) scale(.97);transition:transform .4s cubic-bezier(.175,.885,.32,1.275);
 }
-#modal.show .mbox{transform:translateY(0)}
+#modal.show .mbox{transform:translateY(0) scale(1)}
 .m-head{display:flex;align-items:center;gap:14px;margin-bottom:22px}
-.m-logo{width:46px;height:46px;border-radius:13px;object-fit:cover}
+.m-logo-wrap{
+  width:48px;height:48px;border-radius:14px;
+  background:linear-gradient(135deg,rgba(var(--C-RGB),.2),rgba(var(--G-RGB),.1));
+  border:1px solid rgba(var(--C-RGB),.3);
+  display:flex;align-items:center;justify-content:center;font-size:1.5rem;
+}
 .m-title{font-size:1.55rem;font-weight:800;letter-spacing:-.5px}
 .m-sub{color:var(--C);font-size:.72rem;letter-spacing:2.5px;text-transform:uppercase;margin-top:2px}
 .m-desc{color:var(--T2);font-size:.84rem;line-height:1.65;margin-bottom:26px}
 .mbtn{
-  width:100%;padding:14px 18px;border:none;border-radius:13px;
+  width:100%;padding:14px 18px;border:none;border-radius:14px;
   cursor:pointer;font-family:var(--FONT);font-size:.9rem;font-weight:600;
-  display:flex;align-items:center;gap:14px;transition:all .22s;margin-bottom:10px;
-  text-align:left;
+  display:flex;align-items:center;gap:14px;transition:all .25s cubic-bezier(.4,0,.2,1);margin-bottom:10px;
+  text-align:left;position:relative;overflow:hidden;
 }
-.mbtn-p{background:linear-gradient(135deg,var(--C),var(--P));color:#fff}
-.mbtn-p:hover{transform:translateY(-2px);box-shadow:0 10px 28px rgba(var(--C-RGB),.4)}
+.mbtn::after{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(255,255,255,.06),transparent 60%);pointer-events:none}
+.mbtn-p{background:linear-gradient(135deg,var(--C),var(--P));color:#fff;box-shadow:0 4px 20px rgba(var(--C-RGB),.25)}
+.mbtn-p:hover{transform:translateY(-3px);box-shadow:0 12px 32px rgba(var(--C-RGB),.4)}
 .mbtn-s{background:var(--GLASS);color:var(--T1);border:1px solid var(--BORDER)}
-.mbtn-s:hover{background:rgba(var(--C-RGB),.12)}
+.mbtn-s:hover{background:rgba(var(--C-RGB),.12);transform:translateY(-2px)}
 .mbtn-icon{font-size:1.4rem;flex-shrink:0}
 .mbtn-label{font-size:.72rem;font-weight:400;opacity:.75;margin-top:1px}
 .divider{display:flex;align-items:center;gap:10px;color:var(--T3);font-size:.73rem;margin:14px 0}
 .divider::before,.divider::after{content:'';flex:1;height:1px;background:var(--BORDER)}
 .csel{
-  width:100%;background:rgba(0,0,0,.3);border:1px solid var(--BORDER);
-  border-radius:11px;color:var(--T1);padding:12px 16px;
+  width:100%;background:rgba(0,0,0,.35);border:1px solid var(--BORDER);
+  border-radius:12px;color:var(--T1);padding:12px 16px;
   font-size:.88rem;font-family:var(--FONT);appearance:none;cursor:pointer;
   background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%234FB3BF' stroke-width='2' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
   background-repeat:no-repeat;background-position:right 14px center;padding-right:38px;
+  transition:border-color .2s;
 }
-.csel:focus{outline:none;border-color:var(--C)}
+.csel:focus{outline:none;border-color:var(--C);box-shadow:0 0 0 3px rgba(var(--C-RGB),.15)}
 .m-privacy{font-size:.7rem;color:var(--T3);text-align:center;margin-top:14px}
 
-/* ── NAV ─────────────────────────── */
+/* ══ NAV ══ */
 .nav{
   height:58px;display:flex;align-items:center;justify-content:space-between;
   padding:0 18px;background:rgba(15,30,41,.97);
-  border-bottom:1px solid var(--BORDER);backdrop-filter:blur(20px);
+  border-bottom:1px solid var(--BORDER);backdrop-filter:blur(24px);
   flex-shrink:0;z-index:100;position:relative;
 }
+.nav::after{
+  content:'';position:absolute;bottom:0;left:0;right:0;height:1px;
+  background:linear-gradient(90deg,transparent,rgba(var(--C-RGB),.3),transparent);
+}
 .nav-brand{display:flex;align-items:center;gap:10px;cursor:pointer}
-.nav-logo{width:30px;height:30px;border-radius:9px;object-fit:cover}
+.nav-logo-wrap{
+  width:32px;height:32px;border-radius:9px;
+  background:linear-gradient(135deg,rgba(var(--C-RGB),.25),rgba(var(--G-RGB),.15));
+  border:1px solid rgba(var(--C-RGB),.3);
+  display:flex;align-items:center;justify-content:center;font-size:1rem;
+  transition:all .3s;
+}
+.nav-brand:hover .nav-logo-wrap{transform:rotate(-8deg) scale(1.1);box-shadow:0 0 14px rgba(var(--C-RGB),.3)}
 .nav-wordmark{font-size:1.35rem;font-weight:900;letter-spacing:-.5px}
 .nav-wordmark em{font-style:normal;color:var(--C)}
 .nav-right{display:flex;align-items:center;gap:8px}
@@ -124,30 +189,30 @@ html,body{height:100%;overflow:hidden;font-family:var(--FONT);background:var(--B
   background:var(--GLASS);border:1px solid var(--BORDER);
   border-radius:20px;padding:5px 13px;
   font-size:.75rem;color:var(--T2);cursor:pointer;
-  transition:all .2s;white-space:nowrap;max-width:200px;overflow:hidden;text-overflow:ellipsis;
+  transition:all .25s;white-space:nowrap;max-width:200px;overflow:hidden;text-overflow:ellipsis;
 }
-.nav-pill:hover{background:rgba(var(--C-RGB),.12);border-color:var(--C)}
+.nav-pill:hover{background:rgba(var(--C-RGB),.12);border-color:var(--C);transform:translateY(-1px)}
 .nav-pill .dot{width:7px;height:7px;border-radius:50%;background:var(--G);flex-shrink:0;animation:pdot 2s infinite}
 @keyframes pdot{0%,100%{box-shadow:0 0 0 0 rgba(var(--G-RGB),.7)}50%{box-shadow:0 0 0 5px rgba(var(--G-RGB),0)}}
 .nav-clock{font-family:var(--MONO);font-size:.72rem;color:var(--C);
   background:rgba(var(--C-RGB),.08);border:1px solid rgba(var(--C-RGB),.15);
   border-radius:8px;padding:5px 10px;letter-spacing:.5px}
 
-/* ── LAYOUT ─────────────────────────── */
-#app{display:flex;flex-direction:column;height:100vh;opacity:0;transition:opacity .5s}
+/* ══ LAYOUT ══ */
+#app{display:flex;flex-direction:column;height:100vh;opacity:0;transition:opacity .7s ease}
 #app.on{opacity:1}
 .main{display:flex;flex:1;overflow:hidden;position:relative}
 
-/* ── MAP ─────────────────────────── */
+/* ══ MAP ══ */
 .map-wrap{flex:1;position:relative}
 #map{width:100%;height:100%;z-index:1}
 
 .map-stats{
   position:absolute;top:12px;left:50%;transform:translateX(-50%);
   z-index:400;display:flex;gap:8px;
-  background:rgba(15,30,41,.92);border:1px solid var(--BORDER);
-  border-radius:30px;padding:8px 18px;backdrop-filter:blur(16px);
-  box-shadow:var(--SHADOW);
+  background:rgba(15,30,41,.94);border:1px solid var(--BORDER);
+  border-radius:30px;padding:8px 18px;backdrop-filter:blur(20px);
+  box-shadow:var(--SHADOW),0 0 0 1px rgba(var(--C-RGB),.06);
 }
 .mstat{display:flex;align-items:center;gap:6px;font-size:.75rem}
 .mstat-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
@@ -156,26 +221,27 @@ html,body{height:100%;overflow:hidden;font-family:var(--FONT);background:var(--B
 
 .map-ctrl{position:absolute;bottom:40px;right:12px;z-index:400;display:flex;flex-direction:column;gap:6px}
 .mcbtn{
-  background:rgba(15,30,41,.94);border:1px solid var(--BORDER);
-  color:var(--T1);padding:9px 14px;border-radius:10px;
+  background:rgba(15,30,41,.95);border:1px solid var(--BORDER);
+  color:var(--T1);padding:9px 14px;border-radius:11px;
   cursor:pointer;font-size:.72rem;font-family:var(--FONT);font-weight:600;
-  backdrop-filter:blur(12px);transition:all .2s;
+  backdrop-filter:blur(16px);transition:all .25s cubic-bezier(.4,0,.2,1);
   display:flex;align-items:center;gap:6px;white-space:nowrap;
+  box-shadow:0 4px 16px rgba(0,0,0,.3);
 }
-.mcbtn:hover{background:rgba(var(--C-RGB),.15);border-color:var(--C);color:var(--C)}
+.mcbtn:hover{background:rgba(var(--C-RGB),.15);border-color:var(--C);color:var(--C);transform:translateX(-3px)}
 
 .map-legend{
   position:absolute;bottom:40px;left:12px;z-index:400;
-  background:rgba(15,30,41,.94);border:1px solid var(--BORDER);
-  border-radius:12px;padding:12px 15px;backdrop-filter:blur(12px);
+  background:rgba(15,30,41,.95);border:1px solid var(--BORDER);
+  border-radius:14px;padding:13px 16px;backdrop-filter:blur(16px);
   box-shadow:var(--SHADOW);
 }
-.leg-title{font-size:.62rem;letter-spacing:2px;text-transform:uppercase;color:var(--T3);margin-bottom:8px}
-.leg-row{display:flex;align-items:center;gap:8px;font-size:.75rem;color:var(--T2);margin-bottom:5px}
+.leg-title{font-size:.62rem;letter-spacing:2px;text-transform:uppercase;color:var(--T3);margin-bottom:10px}
+.leg-row{display:flex;align-items:center;gap:8px;font-size:.75rem;color:var(--T2);margin-bottom:6px}
 .leg-row:last-child{margin-bottom:0}
 .leg-dot{width:11px;height:11px;border-radius:50%;flex-shrink:0}
 
-/* ── SIDE PANEL ─────────────────────────── */
+/* ══ SIDE PANEL ══ */
 .panel{
   width:330px;background:var(--CARD);
   border-left:1px solid var(--BORDER);
@@ -186,47 +252,69 @@ html,body{height:100%;overflow:hidden;font-family:var(--FONT);background:var(--B
 /* Status Card */
 .sc{
   padding:18px 18px 16px;border-bottom:1px solid var(--BORDER);
-  transition:background 1.2s ease;position:relative;overflow:hidden;
+  transition:background 1.4s ease;position:relative;overflow:hidden;
 }
 .sc.on{background:linear-gradient(135deg,rgba(var(--G-RGB),.14) 0%,rgba(var(--C-RGB),.06) 100%)}
 .sc.off{background:linear-gradient(135deg,rgba(var(--R-RGB),.16) 0%,rgba(var(--R-RGB),.04) 100%)}
 .sc.risk{background:linear-gradient(135deg,rgba(var(--O-RGB),.16) 0%,rgba(var(--R-RGB),.05) 100%)}
+
+/* Onda animada mejorada */
+.sc-waves{position:absolute;bottom:0;left:0;right:0;height:50px;pointer-events:none;overflow:hidden}
 .sc-wave{
-  position:absolute;bottom:-20px;left:-10%;right:-10%;height:60px;
-  background:linear-gradient(180deg,transparent,rgba(var(--C-RGB),.08));
-  border-radius:50% 50% 0 0;animation:waveAnim 4s ease-in-out infinite;pointer-events:none;
+  position:absolute;bottom:0;left:-10%;width:120%;height:100%;
+  border-radius:50% 50% 0 0;
 }
-.sc-wave2{
-  position:absolute;bottom:-30px;left:-15%;right:-15%;height:65px;
-  background:linear-gradient(180deg,transparent,rgba(var(--C-RGB),.05));
-  border-radius:50% 50% 0 0;animation:waveAnim 5.5s ease-in-out infinite reverse;pointer-events:none;
-}
-@keyframes waveAnim{0%,100%{transform:translateX(0) scaleY(1)}50%{transform:translateX(3%) scaleY(1.15)}}
+.sc-wave1{background:rgba(var(--C-RGB),.08);animation:wave1 6s ease-in-out infinite}
+.sc-wave2{background:rgba(var(--C-RGB),.05);animation:wave2 8s ease-in-out infinite reverse;height:80%}
+.sc-wave3{background:rgba(var(--C-RGB),.03);animation:wave3 5s ease-in-out infinite;height:60%}
+@keyframes wave1{0%,100%{transform:translateX(0) scaleY(1)}50%{transform:translateX(4%) scaleY(1.2)}}
+@keyframes wave2{0%,100%{transform:translateX(0) scaleY(1)}50%{transform:translateX(-5%) scaleY(1.3)}}
+@keyframes wave3{0%,100%{transform:translateX(0) scaleY(1)}50%{transform:translateX(3%) scaleY(.9)}}
+
 .sc-top{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:12px}
 .sc-colony{font-size:1.05rem;font-weight:800;letter-spacing:-.3px}
 .sc-sub{font-size:.7rem;color:var(--T3);margin-top:2px;font-family:var(--MONO)}
 .sc-icon{
-  width:48px;height:48px;border-radius:50%;
+  width:50px;height:50px;border-radius:50%;
   display:flex;align-items:center;justify-content:center;font-size:1.6rem;
-  position:relative;flex-shrink:0;
+  position:relative;flex-shrink:0;transition:all .5s;
 }
-.sc-icon.on{background:radial-gradient(circle,rgba(var(--G-RGB),.25),rgba(var(--C-RGB),.1));animation:rippleG 2.5s infinite}
-.sc-icon.off{background:radial-gradient(circle,rgba(var(--R-RGB),.22),transparent);animation:rippleR 2s infinite}
-.sc-icon.risk{background:radial-gradient(circle,rgba(var(--O-RGB),.25),transparent);animation:rippleO 2s infinite}
-@keyframes rippleG{0%{box-shadow:0 0 0 0 rgba(var(--G-RGB),.5)}70%{box-shadow:0 0 0 18px rgba(var(--G-RGB),0)}100%{box-shadow:0 0 0 0 rgba(var(--G-RGB),0)}}
-@keyframes rippleR{0%{box-shadow:0 0 0 0 rgba(var(--R-RGB),.5)}70%{box-shadow:0 0 0 15px rgba(var(--R-RGB),0)}100%{box-shadow:0 0 0 0 rgba(var(--R-RGB),0)}}
-@keyframes rippleO{0%{box-shadow:0 0 0 0 rgba(var(--O-RGB),.5)}70%{box-shadow:0 0 0 15px rgba(var(--O-RGB),0)}100%{box-shadow:0 0 0 0 rgba(var(--O-RGB),0)}}
+.sc-icon.on{
+  background:radial-gradient(circle,rgba(var(--G-RGB),.3),rgba(var(--C-RGB),.1));
+  animation:pulseG 2.5s infinite;
+}
+.sc-icon.off{
+  background:radial-gradient(circle,rgba(var(--R-RGB),.25),transparent);
+  animation:pulseR 2s infinite;
+}
+.sc-icon.risk{
+  background:radial-gradient(circle,rgba(var(--O-RGB),.3),transparent);
+  animation:pulseO 2s infinite;
+}
+@keyframes pulseG{
+  0%,100%{box-shadow:0 0 0 0 rgba(var(--G-RGB),.5),0 0 20px rgba(var(--G-RGB),.2)}
+  50%{box-shadow:0 0 0 20px rgba(var(--G-RGB),0),0 0 20px rgba(var(--G-RGB),.3)}
+}
+@keyframes pulseR{
+  0%,100%{box-shadow:0 0 0 0 rgba(var(--R-RGB),.5),0 0 15px rgba(var(--R-RGB),.2)}
+  50%{box-shadow:0 0 0 16px rgba(var(--R-RGB),0),0 0 15px rgba(var(--R-RGB),.3)}
+}
+@keyframes pulseO{
+  0%,100%{box-shadow:0 0 0 0 rgba(var(--O-RGB),.5),0 0 15px rgba(var(--O-RGB),.2)}
+  50%{box-shadow:0 0 0 16px rgba(var(--O-RGB),0),0 0 15px rgba(var(--O-RGB),.3)}
+}
 .sc-badge{
   display:inline-flex;align-items:center;gap:6px;
   padding:5px 12px;border-radius:20px;font-size:.72rem;font-weight:700;letter-spacing:.8px;
+  transition:all .4s;
 }
-.sc-badge.on{background:rgba(var(--G-RGB),.18);color:var(--G);border:1px solid rgba(var(--G-RGB),.35)}
-.sc-badge.off{background:rgba(var(--R-RGB),.18);color:#E08A7B;border:1px solid rgba(var(--R-RGB),.35)}
-.sc-badge.risk{background:rgba(var(--O-RGB),.18);color:var(--O);border:1px solid rgba(var(--O-RGB),.35)}
+.sc-badge.on{background:rgba(var(--G-RGB),.18);color:var(--G);border:1px solid rgba(var(--G-RGB),.35);box-shadow:0 0 12px rgba(var(--G-RGB),.15)}
+.sc-badge.off{background:rgba(var(--R-RGB),.18);color:#E08A7B;border:1px solid rgba(var(--R-RGB),.35);box-shadow:0 0 12px rgba(var(--R-RGB),.15)}
+.sc-badge.risk{background:rgba(var(--O-RGB),.18);color:var(--O);border:1px solid rgba(var(--O-RGB),.35);box-shadow:0 0 12px rgba(var(--O-RGB),.15)}
 .sc-msg{font-size:.8rem;color:var(--T2);line-height:1.55;margin:10px 0}
 .sc-eta{
   background:rgba(0,0,0,.2);border:1px solid rgba(var(--O-RGB),.25);
-  border-radius:9px;padding:10px 12px;
+  border-radius:10px;padding:10px 12px;
 }
 .sc-eta-label{font-size:.62rem;letter-spacing:2px;text-transform:uppercase;color:var(--T3);margin-bottom:4px}
 .sc-eta-val{font-family:var(--MONO);font-size:1.5rem;font-weight:500;color:var(--O)}
@@ -234,9 +322,10 @@ html,body{height:100%;overflow:hidden;font-family:var(--FONT);background:var(--B
 
 /* Stats row */
 .stats-row{display:grid;grid-template-columns:1fr 1fr 1fr;border-bottom:1px solid var(--BORDER)}
-.sbox{padding:12px 10px;text-align:center;border-right:1px solid var(--BORDER)}
+.sbox{padding:12px 10px;text-align:center;border-right:1px solid var(--BORDER);transition:background .3s}
 .sbox:last-child{border-right:none}
-.sbox-val{font-family:var(--MONO);font-size:1.55rem;font-weight:500;line-height:1}
+.sbox:hover{background:rgba(var(--C-RGB),.04)}
+.sbox-val{font-family:var(--MONO);font-size:1.55rem;font-weight:500;line-height:1;transition:all .5s}
 .sbox-val.g{color:var(--G)}
 .sbox-val.r{color:var(--R)}
 .sbox-val.o{color:var(--O)}
@@ -245,22 +334,28 @@ html,body{height:100%;overflow:hidden;font-family:var(--FONT);background:var(--B
 /* Report buttons */
 .report-card{display:flex;gap:10px;padding:14px 16px;border-bottom:1px solid var(--BORDER)}
 .rbtn{
-  flex:1;padding:11px 8px;border:none;border-radius:11px;cursor:pointer;
-  font-family:var(--FONT);font-size:.8rem;font-weight:700;transition:all .2s;color:#fff;
+  flex:1;padding:11px 8px;border:none;border-radius:12px;cursor:pointer;
+  font-family:var(--FONT);font-size:.8rem;font-weight:700;transition:all .25s cubic-bezier(.4,0,.2,1);color:#fff;
+  position:relative;overflow:hidden;
 }
-.rbtn.green{background:var(--G)}
-.rbtn.green:hover{background:var(--G2);transform:translateY(-2px);box-shadow:0 8px 22px rgba(var(--G-RGB),.4)}
-.rbtn.red{background:var(--R)}
-.rbtn.red:hover{background:#B05A4C;transform:translateY(-2px);box-shadow:0 8px 22px rgba(var(--R-RGB),.4)}
+.rbtn::after{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(255,255,255,.12),transparent 60%);pointer-events:none}
+.rbtn.green{background:linear-gradient(135deg,var(--G),var(--G2))}
+.rbtn.green:hover{transform:translateY(-3px);box-shadow:0 10px 28px rgba(var(--G-RGB),.45)}
+.rbtn.red{background:linear-gradient(135deg,var(--R),#B05A4C)}
+.rbtn.red:hover{transform:translateY(-3px);box-shadow:0 10px 28px rgba(var(--R-RGB),.45)}
 
 /* Tabs */
-.tabs{display:flex;border-bottom:1px solid var(--BORDER);flex-shrink:0}
+.tabs{display:flex;border-bottom:1px solid var(--BORDER);flex-shrink:0;position:relative}
+.tabs::after{
+  content:'';position:absolute;bottom:0;height:2px;background:var(--C);
+  transition:left .3s cubic-bezier(.4,0,.2,1),width .3s cubic-bezier(.4,0,.2,1);
+}
 .tab{
   flex:1;padding:10px 6px;text-align:center;font-size:.72rem;font-weight:600;
   color:var(--T3);cursor:pointer;transition:all .2s;letter-spacing:.8px;
-  text-transform:uppercase;border-bottom:2px solid transparent;
+  text-transform:uppercase;
 }
-.tab.a{color:var(--C);border-bottom-color:var(--C)}
+.tab.a{color:var(--C)}
 .tab:hover:not(.a){color:var(--T2)}
 
 .pcontent{flex:1;overflow-y:auto;scrollbar-width:thin;scrollbar-color:var(--P) transparent}
@@ -268,133 +363,175 @@ html,body{height:100%;overflow:hidden;font-family:var(--FONT);background:var(--B
 .pcontent::-webkit-scrollbar-thumb{background:var(--P);border-radius:2px}
 
 /* Colony item */
-.ci{display:flex;align-items:center;gap:11px;padding:11px 16px;border-bottom:1px solid rgba(255,255,255,.04);cursor:pointer;transition:background .18s}
-.ci:hover{background:rgba(var(--C-RGB),.06)}
+.ci{
+  display:flex;align-items:center;gap:11px;padding:11px 16px;
+  border-bottom:1px solid rgba(255,255,255,.04);cursor:pointer;transition:all .2s;
+}
+.ci:hover{background:rgba(var(--C-RGB),.06);transform:translateX(2px)}
 .ci.user{border-left:3px solid var(--G);padding-left:13px}
 .ci.selected{background:rgba(var(--C-RGB),.08)}
-.cidot{width:11px;height:11px;border-radius:50%;flex-shrink:0}
-.cidot.on{background:var(--G);box-shadow:0 0 7px rgba(var(--G-RGB),.65)}
-.cidot.off{background:var(--R);box-shadow:0 0 7px rgba(var(--R-RGB),.65)}
-.cidot.risk{background:var(--O);box-shadow:0 0 7px rgba(var(--O-RGB),.65)}
+.cidot{width:11px;height:11px;border-radius:50%;flex-shrink:0;transition:all .4s}
+.cidot.on{background:var(--G);box-shadow:0 0 8px rgba(var(--G-RGB),.7)}
+.cidot.off{background:var(--R);box-shadow:0 0 8px rgba(var(--R-RGB),.7)}
+.cidot.risk{background:var(--O);box-shadow:0 0 8px rgba(var(--O-RGB),.7)}
 .ci-name{font-size:.83rem;font-weight:600;flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .ci-detail{font-size:.68rem;color:var(--T3);margin-top:2px}
 .ci-zone{font-size:.68rem;color:var(--T3);font-family:var(--MONO);flex-shrink:0}
 
 /* Event item */
-.ei{display:flex;align-items:flex-start;gap:11px;padding:12px 16px;border-bottom:1px solid rgba(255,255,255,.04)}
-.ei-icon{width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.85rem;flex-shrink:0;margin-top:1px}
-.ei-icon.on{background:rgba(var(--G-RGB),.18)}
-.ei-icon.off{background:rgba(var(--R-RGB),.18)}
-.ei-icon.risk{background:rgba(var(--O-RGB),.18)}
+.ei{display:flex;align-items:flex-start;gap:11px;padding:12px 16px;border-bottom:1px solid rgba(255,255,255,.04);animation:slideInEvent .3s ease forwards}
+@keyframes slideInEvent{from{opacity:0;transform:translateY(-8px)}to{opacity:1;transform:translateY(0)}}
+.ei-icon{width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.85rem;flex-shrink:0;margin-top:1px;transition:transform .2s}
+.ei:hover .ei-icon{transform:scale(1.1)}
+.ei-icon.on{background:rgba(var(--G-RGB),.18);box-shadow:0 0 10px rgba(var(--G-RGB),.2)}
+.ei-icon.off{background:rgba(var(--R-RGB),.18);box-shadow:0 0 10px rgba(var(--R-RGB),.2)}
+.ei-icon.risk{background:rgba(var(--O-RGB),.18);box-shadow:0 0 10px rgba(var(--O-RGB),.2)}
 .ei-msg{font-size:.78rem;color:var(--T2);line-height:1.5}
 .ei-time{font-size:.68rem;color:var(--T3);margin-top:4px;font-family:var(--MONO)}
 
-/* ── NOTIFICATIONS ─────────────────────────── */
-#notifs{position:fixed;top:70px;right:16px;z-index:2000;display:flex;flex-direction:column;gap:10px;max-width:330px;pointer-events:none}
+/* ══ NOTIFICATIONS ══ */
+#notifs{position:fixed;top:70px;right:16px;z-index:2000;display:flex;flex-direction:column;gap:10px;max-width:340px;pointer-events:none}
 .notif{
-  background:rgba(15,30,41,.97);border:1px solid var(--BORDER);
-  border-radius:14px;padding:14px 16px;
-  box-shadow:0 12px 40px rgba(0,0,0,.45);backdrop-filter:blur(24px);
-  transform:translateX(360px);transition:transform .45s cubic-bezier(.175,.885,.32,1.275);
+  background:rgba(12,26,38,.98);border:1px solid var(--BORDER);
+  border-radius:16px;padding:15px 16px;
+  box-shadow:0 16px 48px rgba(0,0,0,.5),0 0 0 1px rgba(var(--C-RGB),.06);
+  backdrop-filter:blur(28px);
+  transform:translateX(380px) scale(.95);
+  transition:transform .5s cubic-bezier(.175,.885,.32,1.275),opacity .3s;
   display:flex;gap:12px;align-items:flex-start;pointer-events:all;
+  position:relative;overflow:hidden;
 }
-.notif.in{transform:translateX(0)}
+.notif::before{
+  content:'';position:absolute;top:0;left:0;right:0;height:1px;
+  background:linear-gradient(90deg,transparent,rgba(var(--C-RGB),.3),transparent);
+}
+.notif.in{transform:translateX(0) scale(1)}
+.notif.out{transform:translateX(380px) scale(.9);opacity:0}
 .notif.water-on{border-left:4px solid var(--G)}
 .notif.water-off{border-left:4px solid var(--R)}
 .notif.risk{border-left:4px solid var(--O)}
 .notif.info{border-left:4px solid var(--C)}
-.n-ico{font-size:1.35rem;flex-shrink:0;line-height:1.2}
-.n-title{font-size:.84rem;font-weight:700;margin-bottom:3px}
+.n-ico{font-size:1.4rem;flex-shrink:0;line-height:1.2}
+.n-title{font-size:.85rem;font-weight:700;margin-bottom:3px}
 .n-body{font-size:.76rem;color:var(--T2);line-height:1.45}
 .n-time{font-size:.67rem;color:var(--T3);margin-top:5px;font-family:var(--MONO)}
-.n-close{cursor:pointer;color:var(--T3);padding:0 2px;font-size:.9rem;margin-left:auto;flex-shrink:0;transition:color .2s;line-height:1}
-.n-close:hover{color:var(--T1)}
+.n-close{cursor:pointer;color:var(--T3);padding:2px 4px;font-size:.85rem;margin-left:auto;flex-shrink:0;transition:all .2s;line-height:1;border-radius:4px}
+.n-close:hover{color:var(--T1);background:rgba(255,255,255,.08)}
+/* Progress bar debajo de la notificación */
+.n-progress{
+  position:absolute;bottom:0;left:4px;right:4px;height:2px;
+  background:rgba(255,255,255,.08);border-radius:1px;overflow:hidden;
+}
+.n-progress-bar{
+  height:100%;border-radius:1px;
+  animation:npb 6.5s linear forwards;
+}
+.notif.water-on .n-progress-bar{background:var(--G)}
+.notif.water-off .n-progress-bar{background:var(--R)}
+.notif.risk .n-progress-bar{background:var(--O)}
+.notif.info .n-progress-bar{background:var(--C)}
+@keyframes npb{from{width:100%}to{width:0%}}
 
-/* ── MOBILE BOTTOM NAV ─────────────────────────── */
+/* ══ MOBILE BOTTOM NAV ══ */
 .bnav{
   display:none;position:fixed;bottom:0;left:0;right:0;
-  background:rgba(15,30,41,.97);border-top:1px solid var(--BORDER);
-  padding:6px 8px 8px;z-index:500;justify-content:space-around;backdrop-filter:blur(20px);
+  background:rgba(12,26,38,.98);border-top:1px solid var(--BORDER);
+  padding:6px 8px env(safe-area-inset-bottom);z-index:500;
+  justify-content:space-around;backdrop-filter:blur(24px);
 }
-.bni{display:flex;flex-direction:column;align-items:center;gap:3px;padding:6px 18px;cursor:pointer;font-size:.62rem;font-weight:600;color:var(--T3);transition:color .2s;letter-spacing:.5px;text-transform:uppercase}
+.bni{display:flex;flex-direction:column;align-items:center;gap:3px;padding:6px 18px;cursor:pointer;font-size:.62rem;font-weight:600;color:var(--T3);transition:all .2s;letter-spacing:.5px;text-transform:uppercase}
 .bni.a{color:var(--C)}
-.bni-ico{font-size:1.25rem}
-
-#msheet{display:none;position:fixed;bottom:56px;left:0;right:0;z-index:400;background:var(--CARD);border-top:1px solid var(--BORDER);max-height:62vh;overflow-y:auto;padding:16px}
-
-/* ── LEAFLET OVERRIDES ─────────────────────────── */
-.leaflet-popup-content-wrapper{
-  background:rgba(15,30,41,.97)!important;border:1px solid rgba(var(--C-RGB),.3)!important;
-  border-radius:14px!important;color:var(--T1)!important;
-  box-shadow:0 12px 48px rgba(0,0,0,.5)!important;padding:0!important;
+.bni:hover:not(.a){color:var(--T2)}
+.bni-ico{font-size:1.25rem;transition:transform .2s}
+.bni.a .bni-ico{transform:scale(1.15)}
+.bni-ico-wrap{position:relative}
+.bni-ico-wrap::after{
+  content:'';position:absolute;inset:-4px;border-radius:10px;
+  background:rgba(var(--C-RGB),.0);transition:background .2s;
 }
-.leaflet-popup-content{margin:0!important;padding:16px 18px!important}
+.bni.a .bni-ico-wrap::after{background:rgba(var(--C-RGB),.1)}
+
+#msheet{
+  display:none;position:fixed;bottom:56px;left:0;right:0;z-index:400;
+  background:var(--CARD);border-top:1px solid var(--BORDER);
+  max-height:65vh;overflow-y:auto;padding:18px;
+  backdrop-filter:blur(20px);
+}
+
+/* ══ LEAFLET OVERRIDES ══ */
+.leaflet-popup-content-wrapper{
+  background:rgba(12,26,38,.98)!important;border:1px solid rgba(var(--C-RGB),.3)!important;
+  border-radius:16px!important;color:var(--T1)!important;
+  box-shadow:0 16px 56px rgba(0,0,0,.55),0 0 0 1px rgba(var(--C-RGB),.08)!important;padding:0!important;
+}
+.leaflet-popup-content{margin:0!important;padding:18px 20px!important}
 .leaflet-popup-tip-container{margin-top:-1px}
-.leaflet-popup-tip{background:rgba(15,30,41,.97)!important}
-.leaflet-popup-close-button{color:var(--T3)!important;font-size:18px!important;top:10px!important;right:12px!important}
+.leaflet-popup-tip{background:rgba(12,26,38,.98)!important}
+.leaflet-popup-close-button{color:var(--T3)!important;font-size:18px!important;top:10px!important;right:12px!important;transition:color .2s!important}
 .leaflet-popup-close-button:hover{color:var(--T1)!important}
 .leaflet-container{background:#0F1E29}
-.leaflet-control-zoom a{background:rgba(15,30,41,.94)!important;color:var(--T1)!important;border:1px solid var(--BORDER)!important}
-.leaflet-control-zoom a:hover{background:rgba(var(--C-RGB),.15)!important;color:var(--C)!important}
+.leaflet-control-zoom a{background:rgba(12,26,38,.95)!important;color:var(--T1)!important;border:1px solid var(--BORDER)!important;transition:all .2s!important}
+.leaflet-control-zoom a:hover{background:rgba(var(--C-RGB),.15)!important;color:var(--C)!important;border-color:var(--C)!important}
 .leaflet-bar{border:none!important;box-shadow:var(--SHADOW)!important}
 
-/* ── RESPONSIVE ─────────────────────────── */
+/* ══ RESPONSIVE ══ */
 @media(max-width:900px){.panel{display:none}.bnav{display:flex}}
 @media(max-width:480px){.map-stats{font-size:.68rem;padding:6px 13px}.nav-clock{display:none}}
 
-/* ── PARTICLES ─────────────────────────── */
-.particle{position:fixed;pointer-events:none;z-index:3000;font-size:1.2rem;animation:particleFly 1.4s ease-out forwards}
-@keyframes particleFly{0%{opacity:1;transform:translateY(0) scale(1)}100%{opacity:0;transform:translateY(-80px) scale(.3)}}
+/* ══ PARTICLES ══ */
+.particle{position:fixed;pointer-events:none;z-index:3000;font-size:1.2rem;animation:particleFly 1.6s cubic-bezier(.4,0,.2,1) forwards}
+@keyframes particleFly{
+  0%{opacity:1;transform:translateY(0) scale(1) rotate(0deg)}
+  100%{opacity:0;transform:translateY(-120px) scale(.2) rotate(180deg)}
+}
 
 .tpane{display:none}
 .tpane.a{display:block}
-.empty{padding:30px;text-align:center;color:var(--T3);font-size:.82rem}
+.empty{padding:32px;text-align:center;color:var(--T3);font-size:.82rem}
 
+/* Animación de entrada para colonia seleccionada */
 @keyframes pusr{
-  0%{box-shadow:0 0 0 0 rgba(var(--C-RGB),.8),0 0 14px rgba(var(--G-RGB),.6)}
-  100%{box-shadow:0 0 0 20px rgba(var(--C-RGB),0),0 0 14px rgba(var(--G-RGB),.6)}
+  0%{box-shadow:0 0 0 0 rgba(var(--C-RGB),.9),0 0 18px rgba(var(--G-RGB),.7)}
+  100%{box-shadow:0 0 0 24px rgba(var(--C-RGB),0),0 0 18px rgba(var(--G-RGB),.7)}
 }
 
-/* ── SECTOR POLÍTICO PANEL ─────────────────────────── */
+/* ══ SECTOR POLÍTICO ══ */
 #polpanel{
   position:fixed;inset:0;z-index:900;
-  background:rgba(0,0,0,.7);backdrop-filter:blur(16px);
+  background:rgba(0,0,0,.72);backdrop-filter:blur(20px);
   display:flex;align-items:center;justify-content:center;
   opacity:0;pointer-events:none;transition:opacity .4s;
 }
 #polpanel.show{opacity:1;pointer-events:all}
 .polbox{
   background:linear-gradient(145deg,#142233,#0a1620);
-  border:1px solid rgba(79,179,191,.25);border-radius:24px;
+  border:1px solid rgba(79,179,191,.25);border-radius:26px;
   padding:28px 26px;width:94%;max-width:560px;
   max-height:90vh;overflow-y:auto;
-  box-shadow:0 0 0 1px rgba(79,179,191,.1),0 32px 90px rgba(0,0,0,.7),0 0 80px rgba(79,179,191,.08);
-  transform:translateY(40px) scale(.96);transition:transform .45s cubic-bezier(.175,.885,.32,1.275);
+  box-shadow:0 0 0 1px rgba(79,179,191,.1),0 36px 100px rgba(0,0,0,.7),0 0 80px rgba(79,179,191,.1);
+  transform:translateY(40px) scale(.95);
+  transition:transform .5s cubic-bezier(.175,.885,.32,1.275);
   scrollbar-width:thin;scrollbar-color:var(--P) transparent;
   position:relative;overflow:hidden;
 }
 #polpanel.show .polbox{transform:translateY(0) scale(1)}
 .polbox::before{
   content:'';position:absolute;top:-60%;left:-40%;width:180%;height:180%;
-  background:radial-gradient(ellipse at 30% 20%,rgba(79,179,191,.07) 0%,transparent 60%),
-             radial-gradient(ellipse at 80% 80%,rgba(93,162,113,.05) 0%,transparent 50%);
-  pointer-events:none;animation:bgShift 8s ease-in-out infinite alternate;
+  background:radial-gradient(ellipse at 30% 20%,rgba(79,179,191,.08) 0%,transparent 60%),
+             radial-gradient(ellipse at 80% 80%,rgba(93,162,113,.06) 0%,transparent 50%);
+  pointer-events:none;animation:bgShift 9s ease-in-out infinite alternate;
 }
-@keyframes bgShift{0%{transform:translate(0,0)}100%{transform:translate(3%,2%)}}
+@keyframes bgShift{0%{transform:translate(0,0)}100%{transform:translate(4%,3%)}}
 .polbox::-webkit-scrollbar{width:3px}
 .polbox::-webkit-scrollbar-thumb{background:var(--P);border-radius:2px}
 .pol-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:4px;position:relative}
 .pol-title{font-size:1.4rem;font-weight:900;letter-spacing:-.5px;display:flex;align-items:center;gap:10px}
 .pol-title em{font-style:normal;color:var(--C);text-shadow:0 0 20px rgba(var(--C-RGB),.5)}
-.pol-title-icon{
-  font-size:1.5rem;animation:spinPulse 4s ease-in-out infinite;
-  filter:drop-shadow(0 0 8px rgba(79,179,191,.6));
-}
+.pol-title-icon{font-size:1.5rem;animation:spinPulse 4.5s ease-in-out infinite;filter:drop-shadow(0 0 10px rgba(79,179,191,.6))}
 @keyframes spinPulse{0%,100%{transform:rotate(0deg) scale(1)}50%{transform:rotate(8deg) scale(1.15)}}
 .pol-close{
-  cursor:pointer;font-size:1.1rem;color:var(--T3);transition:all .2s;
-  padding:6px 8px;border-radius:9px;border:1px solid transparent;
-  line-height:1;
+  cursor:pointer;font-size:1.1rem;color:var(--T3);transition:all .25s;
+  padding:6px 8px;border-radius:10px;border:1px solid transparent;line-height:1;
 }
 .pol-close:hover{color:var(--T1);background:rgba(255,255,255,.06);border-color:var(--BORDER);transform:rotate(90deg)}
 .pol-subtitle{
@@ -406,26 +543,17 @@ html,body{height:100%;overflow:hidden;font-family:var(--FONT);background:var(--B
 .pol-intro{
   font-size:.81rem;color:var(--T2);line-height:1.65;margin-bottom:20px;
   padding:13px 15px;
-  background:linear-gradient(135deg,rgba(var(--C-RGB),.08),rgba(var(--G-RGB),.04));
+  background:linear-gradient(135deg,rgba(var(--C-RGB),.09),rgba(var(--G-RGB),.04));
   border-left:3px solid var(--C);border-radius:0 12px 12px 0;
   position:relative;overflow:hidden;
 }
-.pol-intro::after{
-  content:'ODS';position:absolute;right:-8px;bottom:-12px;
-  font-size:3.5rem;font-weight:900;color:rgba(var(--C-RGB),.04);
-  letter-spacing:-2px;pointer-events:none;
-}
 .ods-grid{display:flex;flex-direction:column;gap:10px}
-
-/* ODS cards con animación de entrada escalonada */
 .ods-card{
-  background:rgba(255,255,255,.025);
-  border:1px solid rgba(255,255,255,.06);
+  background:rgba(255,255,255,.025);border:1px solid rgba(255,255,255,.06);
   border-radius:16px;overflow:hidden;
   transition:border-color .25s,background .25s,box-shadow .25s,transform .2s;
   opacity:0;transform:translateX(-24px);
-  animation:slideInOds .5s ease forwards;
-  position:relative;
+  animation:slideInOds .5s ease forwards;position:relative;
 }
 .ods-card:nth-child(1){animation-delay:.05s}
 .ods-card:nth-child(2){animation-delay:.12s}
@@ -434,95 +562,82 @@ html,body{height:100%;overflow:hidden;font-family:var(--FONT);background:var(--B
 .ods-card:nth-child(5){animation-delay:.33s}
 .ods-card:nth-child(6){animation-delay:.40s}
 @keyframes slideInOds{to{opacity:1;transform:translateX(0)}}
-.ods-card:hover{
-  background:rgba(var(--C-RGB),.07);
-  border-color:rgba(var(--C-RGB),.25);
-  transform:translateX(3px);
-  box-shadow:0 4px 20px rgba(0,0,0,.3),-3px 0 0 var(--C);
-}
-.ods-card.open{
-  border-color:rgba(var(--C-RGB),.3);
-  box-shadow:0 6px 30px rgba(0,0,0,.35),inset 0 1px 0 rgba(var(--C-RGB),.15);
-}
-/* glow bar a la izquierda según color ODS */
-.ods-card::before{
-  content:'';position:absolute;left:0;top:0;bottom:0;width:3px;
-  background:var(--ods-color,var(--C));
-  opacity:0;transition:opacity .25s;border-radius:3px 0 0 3px;
-}
+.ods-card:hover{background:rgba(var(--C-RGB),.07);border-color:rgba(var(--C-RGB),.25);transform:translateX(3px);box-shadow:0 4px 20px rgba(0,0,0,.3),-3px 0 0 var(--C)}
+.ods-card.open{border-color:rgba(var(--C-RGB),.3);box-shadow:0 6px 30px rgba(0,0,0,.35),inset 0 1px 0 rgba(var(--C-RGB),.15)}
+.ods-card::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--ods-color,var(--C));opacity:0;transition:opacity .25s;border-radius:3px 0 0 3px}
 .ods-card:hover::before,.ods-card.open::before{opacity:1}
-
-.ods-head{
-  display:flex;align-items:center;gap:12px;padding:13px 15px;
-  cursor:pointer;user-select:none;
-}
-.ods-counter{
-  font-size:.58rem;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;
-  color:var(--T3);font-family:var(--MONO);flex-shrink:0;width:18px;text-align:right;
-}
-.ods-num{
-  width:38px;height:38px;border-radius:11px;
-  display:flex;align-items:center;justify-content:center;
-  font-size:.85rem;font-weight:900;color:#fff;flex-shrink:0;
-  box-shadow:0 3px 12px rgba(0,0,0,.35);
-  transition:transform .2s,box-shadow .2s;
-  position:relative;overflow:hidden;
-}
-.ods-num::after{
-  content:'';position:absolute;inset:0;
-  background:linear-gradient(135deg,rgba(255,255,255,.2),transparent);
-}
-.ods-card:hover .ods-num,.ods-card.open .ods-num{
-  transform:scale(1.1) rotate(-3deg);
-  box-shadow:0 6px 20px rgba(0,0,0,.4),0 0 15px var(--ods-color,rgba(var(--C-RGB),.4));
-}
+.ods-head{display:flex;align-items:center;gap:12px;padding:13px 15px;cursor:pointer;user-select:none}
+.ods-counter{font-size:.58rem;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--T3);font-family:var(--MONO);flex-shrink:0;width:18px;text-align:right}
+.ods-num{width:38px;height:38px;border-radius:11px;display:flex;align-items:center;justify-content:center;font-size:.85rem;font-weight:900;color:#fff;flex-shrink:0;box-shadow:0 3px 12px rgba(0,0,0,.35);transition:transform .2s,box-shadow .2s;position:relative;overflow:hidden}
+.ods-num::after{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(255,255,255,.2),transparent)}
+.ods-card:hover .ods-num,.ods-card.open .ods-num{transform:scale(1.1) rotate(-3deg);box-shadow:0 6px 20px rgba(0,0,0,.4),0 0 15px var(--ods-color,rgba(var(--C-RGB),.4))}
 .ods-name{font-size:.85rem;font-weight:700;flex:1;line-height:1.3}
-.ods-chevron{
-  color:var(--T3);font-size:.65rem;transition:transform .3s cubic-bezier(.68,-.55,.265,1.55);
-  flex-shrink:0;width:18px;text-align:center;
-}
+.ods-chevron{color:var(--T3);font-size:.65rem;transition:transform .35s cubic-bezier(.68,-.55,.265,1.55);flex-shrink:0;width:18px;text-align:center}
 .ods-card.open .ods-chevron{transform:rotate(180deg);color:var(--C)}
-
-.ods-body{
-  max-height:0;overflow:hidden;
-  transition:max-height .4s cubic-bezier(.4,0,.2,1),padding .3s;
-  padding:0 15px 0 15px;
-}
-.ods-card.open .ods-body{max-height:500px;padding:0 15px 16px 15px}
-.ods-body-inner{
-  padding-top:10px;
-  border-top:1px solid rgba(255,255,255,.06);
-}
+.ods-body{max-height:0;overflow:hidden;transition:max-height .45s cubic-bezier(.4,0,.2,1),padding .3s;padding:0 15px}
+.ods-card.open .ods-body{max-height:500px;padding:0 15px 16px}
+.ods-body-inner{padding-top:10px;border-top:1px solid rgba(255,255,255,.06)}
 .ods-body p{font-size:.79rem;color:var(--T2);line-height:1.65;margin-bottom:8px}
 .ods-body p:last-child{margin-bottom:0}
 .ods-rel{
   background:linear-gradient(135deg,rgba(var(--C-RGB),.08),rgba(var(--G-RGB),.04));
-  border-left:2px solid var(--C);
-  border-radius:0 10px 10px 0;padding:10px 13px;margin-top:10px;
-  font-size:.77rem;color:var(--T2);line-height:1.6;
-  position:relative;
+  border-left:2px solid var(--C);border-radius:0 10px 10px 0;
+  padding:10px 13px;margin-top:10px;
+  font-size:.77rem;color:var(--T2);line-height:1.6;position:relative;
 }
-.ods-rel-icon{
-  position:absolute;right:10px;top:50%;transform:translateY(-50%);
-  font-size:1.4rem;opacity:.15;
-}
-
+.ods-rel-icon{position:absolute;right:10px;top:50%;transform:translateY(-50%);font-size:1.4rem;opacity:.15}
 .pol-sep{height:1px;background:linear-gradient(90deg,transparent,var(--BORDER),transparent);margin:18px 0}
-.pol-footer{
-  font-size:.69rem;color:var(--T3);text-align:center;
-  display:flex;align-items:center;justify-content:center;gap:8px;
-}
+.pol-footer{font-size:.69rem;color:var(--T3);text-align:center;display:flex;align-items:center;justify-content:center;gap:8px}
 .pol-footer::before,.pol-footer::after{content:'';flex:1;height:1px;background:var(--BORDER)}
 
 .nav-gear{
   background:var(--GLASS);border:1px solid var(--BORDER);
   border-radius:10px;padding:6px 10px;cursor:pointer;
-  font-size:.88rem;transition:all .25s;color:var(--T2);
+  font-size:.88rem;transition:all .3s cubic-bezier(.4,0,.2,1);color:var(--T2);
   display:flex;align-items:center;
 }
-.nav-gear:hover{
-  background:rgba(var(--C-RGB),.14);border-color:var(--C);color:var(--C);
-  transform:rotate(45deg);box-shadow:0 0 14px rgba(var(--C-RGB),.25);
+.nav-gear:hover{background:rgba(var(--C-RGB),.14);border-color:var(--C);color:var(--C);transform:rotate(45deg);box-shadow:0 0 16px rgba(var(--C-RGB),.3)}
+
+/* ══ NOTIF OPT-IN ══ */
+#notifopt{
+  position:fixed;inset:0;z-index:850;
+  background:rgba(0,0,0,.65);backdrop-filter:blur(16px);
+  display:flex;align-items:center;justify-content:center;
+  opacity:0;pointer-events:none;transition:opacity .4s;
+}
+#notifopt.show{opacity:1;pointer-events:all}
+#notifopt .mbox{transform:translateY(32px) scale(.97);transition:transform .45s cubic-bezier(.175,.885,.32,1.275)}
+#notifopt.show .mbox{transform:translateY(0) scale(1)}
+.no-bell{font-size:3.2rem;text-align:center;margin-bottom:8px;animation:bellRing 2.5s ease-in-out infinite;transform-origin:50% 4px;filter:drop-shadow(0 0 20px rgba(var(--C-RGB),.5))}
+@keyframes bellRing{
+  0%,55%,100%{transform:rotate(0)}
+  10%{transform:rotate(-15deg)}20%{transform:rotate(15deg)}
+  30%{transform:rotate(-12deg)}40%{transform:rotate(12deg)}50%{transform:rotate(-6deg)}
+}
+.no-title{font-size:1.5rem;font-weight:800;text-align:center;letter-spacing:-.5px}
+.no-sub{color:var(--C);font-size:.66rem;letter-spacing:2.5px;text-transform:uppercase;text-align:center;margin:5px 0 16px}
+.no-desc{color:var(--T2);font-size:.84rem;line-height:1.65;text-align:center;margin-bottom:22px}
+
+/* ══ TOGGLE SWITCH ══ */
+.notif-setting{background:rgba(var(--C-RGB),.05);border:1px solid var(--BORDER);border-radius:16px;padding:15px 16px;margin-bottom:18px}
+.ns-head{display:flex;align-items:center;gap:13px}
+.ns-bell{font-size:1.5rem;flex-shrink:0;filter:drop-shadow(0 0 8px rgba(var(--C-RGB),.4))}
+.ns-title{font-size:.86rem;font-weight:700}
+.ns-status{font-size:.72rem;margin-top:3px;color:var(--T3);font-family:var(--MONO)}
+.switch{position:relative;display:inline-block;width:48px;height:27px;flex-shrink:0}
+.switch input{opacity:0;width:0;height:0}
+.slider{position:absolute;cursor:pointer;inset:0;background:rgba(255,255,255,.15);transition:.35s;border-radius:27px}
+.slider::before{content:'';position:absolute;height:21px;width:21px;left:3px;bottom:3px;background:#fff;border-radius:50%;transition:.35s;box-shadow:0 2px 6px rgba(0,0,0,.4)}
+.switch input:checked+.slider{background:var(--G)}
+.switch input:checked+.slider::before{transform:translateX(21px)}
+.switch input:disabled+.slider{opacity:.45;cursor:not-allowed}
+
+/* ══ MUNICIPIO BADGE en colony items ══ */
+.muni-badge{
+  display:inline-block;font-size:.58rem;font-weight:700;letter-spacing:.8px;
+  padding:2px 6px;border-radius:5px;margin-left:5px;text-transform:uppercase;
+  background:rgba(var(--C-RGB),.12);color:var(--C);
+  vertical-align:middle;
 }
 </style>
 </head>
@@ -530,23 +645,31 @@ html,body{height:100%;overflow:hidden;font-family:var(--FONT);background:var(--B
 
 <!-- ╔══ SPLASH ══╗ -->
 <div id="splash">
+  <!-- Partículas de fondo animadas -->
+  <div class="splash-bg-particles" id="sbg"></div>
+
   <div class="s-rings s-logo">
     <div class="s-ring"></div>
     <div class="s-ring"></div>
     <div class="s-ring"></div>
-    <img class="s-logo-img" src="logo.jpg" alt="Logo de GuardAgua">
+    <div class="s-logo-inner">
+      💧
+      <div class="s-logo-shimmer"></div>
+    </div>
   </div>
   <div class="s-title">Guard<em>Agua</em></div>
   <div class="s-sub">Sistema de Monitoreo IoT</div>
   <div class="s-bar"><div class="s-bar-fill"></div></div>
-  <div class="s-steps" id="s-steps">Inicializando sensores...</div>
+  <div class="s-steps" id="s-steps">
+    <span class="s-step-text">Inicializando sensores...</span>
+  </div>
 </div>
 
 <!-- ╔══ MODAL UBICACIÓN ══╗ -->
 <div id="modal">
   <div class="mbox">
     <div class="m-head">
-      <img class="m-logo" src="logo.jpg" alt="Logo de GuardAgua">
+      <div class="m-logo-wrap">💧</div>
       <div>
         <div class="m-title">¡Bienvenido!</div>
         <div class="m-sub">GuardAgua IoT</div>
@@ -569,12 +692,31 @@ html,body{height:100%;overflow:hidden;font-family:var(--FONT);background:var(--B
   </div>
 </div>
 
+<!-- ╔══ MODAL OPT-IN NOTIFICACIONES ══╗ -->
+<div id="notifopt">
+  <div class="mbox">
+    <div class="no-bell">🔔</div>
+    <div class="no-title">¿Recibir alertas de agua?</div>
+    <div class="no-sub">Notificaciones del sistema</div>
+    <div class="no-desc">Te avisamos al instante cuando el agua llega o se corta en tu colonia. Las notificaciones aparecen directo en tu pantalla, incluso si tienes otra pestaña abierta.</div>
+    <button class="mbtn mbtn-p" onclick="optInYes()">
+      <span class="mbtn-icon">🔔</span>
+      <div><div>Sí, activar alertas</div><div class="mbtn-label">Recibe avisos al instante</div></div>
+    </button>
+    <button class="mbtn mbtn-s" onclick="optInNo()">
+      <span class="mbtn-icon">🔕</span>
+      <div><div>Ahora no</div><div class="mbtn-label">Continuar sin notificaciones</div></div>
+    </button>
+    <div class="m-privacy">Puedes cambiar esto después desde ⚙️ Configuración</div>
+  </div>
+</div>
+
 <!-- ╔══ APP ══╗ -->
 <div id="app">
   <!-- NAV -->
   <nav class="nav">
     <div class="nav-brand" onclick="openModal()">
-      <img class="nav-logo" src="logo.jpg" alt="Logo de GuardAgua">
+      <div class="nav-logo-wrap">💧</div>
       <div class="nav-wordmark">Guard<em>Agua</em></div>
     </div>
     <div class="nav-right">
@@ -593,48 +735,48 @@ html,body{height:100%;overflow:hidden;font-family:var(--FONT);background:var(--B
     <div class="map-wrap">
       <div id="map"></div>
 
-      <!-- Map stats bar -->
       <div class="map-stats">
         <div class="mstat">
-          <div class="mstat-dot" style="background:var(--G);box-shadow:0 0 5px rgba(var(--G-RGB),.6)"></div>
+          <div class="mstat-dot" style="background:var(--G);box-shadow:0 0 6px rgba(var(--G-RGB),.7)"></div>
           <span class="mstat-val" id="ms-on" style="color:var(--G)">—</span>
           <span style="font-size:.7rem;color:var(--T3)"> con agua</span>
         </div>
         <div class="mstat-sep">|</div>
         <div class="mstat">
-          <div class="mstat-dot" style="background:var(--R);box-shadow:0 0 5px rgba(var(--R-RGB),.6)"></div>
+          <div class="mstat-dot" style="background:var(--R);box-shadow:0 0 6px rgba(var(--R-RGB),.7)"></div>
           <span class="mstat-val" id="ms-off" style="color:var(--R)">—</span>
           <span style="font-size:.7rem;color:var(--T3)"> sin agua</span>
         </div>
         <div class="mstat-sep">|</div>
         <div class="mstat">
-          <div class="mstat-dot" style="background:var(--O);box-shadow:0 0 5px rgba(var(--O-RGB),.6)"></div>
+          <div class="mstat-dot" style="background:var(--O);box-shadow:0 0 6px rgba(var(--O-RGB),.7)"></div>
           <span class="mstat-val" id="ms-risk" style="color:var(--O)">—</span>
           <span style="font-size:.7rem;color:var(--T3)"> en riesgo</span>
         </div>
       </div>
 
-      <!-- Controls -->
       <div class="map-ctrl">
         <button class="mcbtn" onclick="centerUser()">📍 Mi colonia</button>
         <button class="mcbtn" onclick="openModal()">🔄 Cambiar</button>
       </div>
 
-      <!-- Legend -->
       <div class="map-legend">
         <div class="leg-title">Estado del Suministro</div>
-        <div class="leg-row"><div class="leg-dot" style="background:var(--G);box-shadow:0 0 5px rgba(var(--G-RGB),.6)"></div>Con agua</div>
-        <div class="leg-row"><div class="leg-dot" style="background:var(--R);box-shadow:0 0 5px rgba(var(--R-RGB),.6)"></div>Sin suministro</div>
-        <div class="leg-row"><div class="leg-dot" style="background:var(--O);box-shadow:0 0 5px rgba(var(--O-RGB),.6)"></div>En riesgo</div>
-        <div class="leg-row"><div class="leg-dot" style="background:var(--C);box-shadow:0 0 7px rgba(var(--C-RGB),.8);border:2px solid white"></div>Mi colonia</div>
+        <div class="leg-row"><div class="leg-dot" style="background:var(--G);box-shadow:0 0 6px rgba(var(--G-RGB),.6)"></div>Con agua</div>
+        <div class="leg-row"><div class="leg-dot" style="background:var(--R);box-shadow:0 0 6px rgba(var(--R-RGB),.6)"></div>Sin suministro</div>
+        <div class="leg-row"><div class="leg-dot" style="background:var(--O);box-shadow:0 0 6px rgba(var(--O-RGB),.6)"></div>En riesgo</div>
+        <div class="leg-row"><div class="leg-dot" style="background:var(--C);box-shadow:0 0 8px rgba(var(--C-RGB),.9);border:2px solid white"></div>Mi colonia</div>
       </div>
     </div>
 
-    <!-- SIDE PANEL (desktop) -->
+    <!-- SIDE PANEL -->
     <div class="panel">
-      <!-- Status card -->
       <div class="sc on" id="sc">
-        <div class="sc-wave"></div><div class="sc-wave2"></div>
+        <div class="sc-waves">
+          <div class="sc-wave sc-wave1"></div>
+          <div class="sc-wave sc-wave2"></div>
+          <div class="sc-wave sc-wave3"></div>
+        </div>
         <div class="sc-top">
           <div>
             <div class="sc-colony" id="sc-name">—</div>
@@ -650,27 +792,23 @@ html,body{height:100%;overflow:hidden;font-family:var(--FONT);background:var(--B
         </div>
       </div>
 
-      <!-- Stats -->
       <div class="stats-row">
         <div class="sbox"><div class="sbox-val g" id="st-on">—</div><div class="sbox-label">Con Agua</div></div>
         <div class="sbox"><div class="sbox-val r" id="st-off">—</div><div class="sbox-label">Sin Agua</div></div>
         <div class="sbox"><div class="sbox-val o" id="st-risk">—</div><div class="sbox-label">En Riesgo</div></div>
       </div>
 
-      <!-- Report -->
       <div class="report-card">
         <button onclick="reportWater(true)" class="rbtn green">💧 Tengo agua</button>
         <button onclick="reportWater(false)" class="rbtn red">🚫 No tengo agua</button>
       </div>
 
-      <!-- Tabs -->
       <div class="tabs">
         <div class="tab a" onclick="switchTab('colonies',this)">Colonias</div>
         <div class="tab" onclick="switchTab('events',this)">Eventos</div>
         <div class="tab" onclick="switchTab('nearby',this)">Cercanas</div>
       </div>
 
-      <!-- Content -->
       <div class="pcontent">
         <div id="t-colonies" class="tpane a"></div>
         <div id="t-events" class="tpane"></div>
@@ -681,17 +819,17 @@ html,body{height:100%;overflow:hidden;font-family:var(--FONT);background:var(--B
 
   <!-- MOBILE BOTTOM NAV -->
   <div class="bnav">
-    <div class="bni a" onclick="mTab('map',this)"><div class="bni-ico">🗺️</div>Mapa</div>
-    <div class="bni" onclick="mTab('status',this)"><div class="bni-ico">💧</div>Estado</div>
-    <div class="bni" onclick="mTab('events',this)"><div class="bni-ico">📋</div>Eventos</div>
-    <div class="bni" onclick="mTab('nearby',this)"><div class="bni-ico">📡</div>Cercanas</div>
+    <div class="bni a" onclick="mTab('map',this)"><div class="bni-ico-wrap"><div class="bni-ico">🗺️</div></div>Mapa</div>
+    <div class="bni" onclick="mTab('status',this)"><div class="bni-ico-wrap"><div class="bni-ico">💧</div></div>Estado</div>
+    <div class="bni" onclick="mTab('events',this)"><div class="bni-ico-wrap"><div class="bni-ico">📋</div></div>Eventos</div>
+    <div class="bni" onclick="mTab('nearby',this)"><div class="bni-ico-wrap"><div class="bni-ico">📡</div></div>Cercanas</div>
   </div>
 </div>
 
 <div id="msheet"></div>
 <div id="notifs"></div>
 
-<!-- ╔══ SECTOR POLÍTICO PANEL ══╗ -->
+<!-- ╔══ SECTOR POLÍTICO ══╗ -->
 <div id="polpanel" onclick="closePolPanel(event)">
   <div class="polbox">
     <div class="pol-header">
@@ -710,8 +848,21 @@ html,body{height:100%;overflow:hidden;font-family:var(--FONT);background:var(--B
       ciudad capital, San Francisco de los Romo, Jesús María y El Llano.
     </div>
 
-    <div class="ods-grid">
+    <div class="notif-setting">
+      <div class="ns-head">
+        <div class="ns-bell">🔔</div>
+        <div style="flex:1">
+          <div class="ns-title">Alertas push del navegador</div>
+          <div class="ns-status" id="ns-status">—</div>
+        </div>
+        <label class="switch">
+          <input type="checkbox" id="notif-toggle" onchange="toggleNotif(this.checked)">
+          <span class="slider"></span>
+        </label>
+      </div>
+    </div>
 
+    <div class="ods-grid">
       <div class="ods-card" id="ods10" style="--ods-color:#E5195D">
         <div class="ods-head" onclick="toggleOds('ods10')">
           <div class="ods-counter">1.</div>
@@ -719,17 +870,11 @@ html,body{height:100%;overflow:hidden;font-family:var(--FONT);background:var(--B
           <div class="ods-name">Reducción de las Desigualdades</div>
           <div class="ods-chevron">▼</div>
         </div>
-        <div class="ods-body">
-          <div class="ods-body-inner">
-            <p>Busca garantizar que nadie se quede atrás, promoviendo la inclusión social, económica y política de todas las personas, independientemente de su edad, sexo, discapacidad, raza, etnia, origen, religión o situación económica.</p>
-            <div class="ods-rel">
-              <span class="ods-rel-icon">⚖️</span>
-              📌 <strong>Relación con el proyecto:</strong> Promueve que todos tengan un consumo responsable y se pongan al corriente con los pagos de servicio para evitar discrepancias. Busca que toda la comunidad esté contenta con el acceso equitativo al agua.
-            </div>
-          </div>
-        </div>
+        <div class="ods-body"><div class="ods-body-inner">
+          <p>Busca garantizar que nadie se quede atrás, promoviendo la inclusión social, económica y política de todas las personas.</p>
+          <div class="ods-rel"><span class="ods-rel-icon">⚖️</span>📌 <strong>Relación con el proyecto:</strong> Promueve que todos tengan un consumo responsable y acceso equitativo al agua en todos los municipios.</div>
+        </div></div>
       </div>
-
       <div class="ods-card" id="ods11" style="--ods-color:#F09600">
         <div class="ods-head" onclick="toggleOds('ods11')">
           <div class="ods-counter">2.</div>
@@ -737,17 +882,11 @@ html,body{height:100%;overflow:hidden;font-family:var(--FONT);background:var(--B
           <div class="ods-name">Ciudades y Comunidades Sostenibles</div>
           <div class="ods-chevron">▼</div>
         </div>
-        <div class="ods-body">
-          <div class="ods-body-inner">
-            <p>Tiene como propósito lograr que las ciudades y comunidades sean más sostenibles, seguras y eficientes para todos sus habitantes.</p>
-            <div class="ods-rel">
-              <span class="ods-rel-icon">🏙️</span>
-              📌 <strong>Relación con el proyecto:</strong> Mejora la calidad de vida mediante tecnología IoT para resolver un problema que afecta directamente a las colonias de Aguascalientes, San Francisco de los Romo, Jesús María y El Llano.
-            </div>
-          </div>
-        </div>
+        <div class="ods-body"><div class="ods-body-inner">
+          <p>Lograr que las ciudades y comunidades sean más sostenibles, seguras y eficientes para todos sus habitantes.</p>
+          <div class="ods-rel"><span class="ods-rel-icon">🏙️</span>📌 <strong>Relación con el proyecto:</strong> Mejora la calidad de vida mediante tecnología IoT para Aguascalientes, San Francisco de los Romo, Jesús María y El Llano.</div>
+        </div></div>
       </div>
-
       <div class="ods-card" id="ods12" style="--ods-color:#BF8B2E">
         <div class="ods-head" onclick="toggleOds('ods12')">
           <div class="ods-counter">3.</div>
@@ -755,17 +894,11 @@ html,body{height:100%;overflow:hidden;font-family:var(--FONT);background:var(--B
           <div class="ods-name">Producción y Consumo Responsables</div>
           <div class="ods-chevron">▼</div>
         </div>
-        <div class="ods-body">
-          <div class="ods-body-inner">
-            <p>Busca desvincular el crecimiento económico de la degradación ambiental. Sus metas incluyen la gestión sostenible de recursos naturales, prevención de residuos mediante reducción, reciclado y reutilización.</p>
-            <div class="ods-rel">
-              <span class="ods-rel-icon">♻️</span>
-              📌 <strong>Relación con el proyecto:</strong> Incentiva a la comunidad a estar atenta al servicio intermitente de agua para evitar desperdiciar agua que no se está consumiendo activamente.
-            </div>
-          </div>
-        </div>
+        <div class="ods-body"><div class="ods-body-inner">
+          <p>Gestión sostenible de recursos naturales y prevención de desperdicios.</p>
+          <div class="ods-rel"><span class="ods-rel-icon">♻️</span>📌 <strong>Relación con el proyecto:</strong> Incentiva a la comunidad a estar atenta al servicio intermitente para evitar desperdicio de agua.</div>
+        </div></div>
       </div>
-
       <div class="ods-card" id="ods13" style="--ods-color:#3F7E44">
         <div class="ods-head" onclick="toggleOds('ods13')">
           <div class="ods-counter">4.</div>
@@ -773,17 +906,11 @@ html,body{height:100%;overflow:hidden;font-family:var(--FONT);background:var(--B
           <div class="ods-name">Acción por el Clima</div>
           <div class="ods-chevron">▼</div>
         </div>
-        <div class="ods-body">
-          <div class="ods-body-inner">
-            <p>Enfocado en adoptar medidas urgentes para combatir el cambio climático. Busca fortalecer la resiliencia ante desastres, integrar medidas climáticas en políticas nacionales y mejorar la educación ambiental y la sensibilización ciudadana.</p>
-            <div class="ods-rel">
-              <span class="ods-rel-icon">🌍</span>
-              📌 <strong>Relación con el proyecto:</strong> Promueve el uso consciente del agua para reducir el desperdicio y fomentar el uso responsable en toda la comunidad de los municipios.
-            </div>
-          </div>
-        </div>
+        <div class="ods-body"><div class="ods-body-inner">
+          <p>Adoptar medidas urgentes para combatir el cambio climático y fortalecer la resiliencia.</p>
+          <div class="ods-rel"><span class="ods-rel-icon">🌍</span>📌 <strong>Relación con el proyecto:</strong> Promueve el uso consciente del agua para reducir el desperdicio en toda la comunidad.</div>
+        </div></div>
       </div>
-
       <div class="ods-card" id="ods16" style="--ods-color:#00689D">
         <div class="ods-head" onclick="toggleOds('ods16')">
           <div class="ods-counter">5.</div>
@@ -791,17 +918,11 @@ html,body{height:100%;overflow:hidden;font-family:var(--FONT);background:var(--B
           <div class="ods-name">Paz, Justicia e Instituciones Sólidas</div>
           <div class="ods-chevron">▼</div>
         </div>
-        <div class="ods-body">
-          <div class="ods-body-inner">
-            <p>Busca construir instituciones más transparentes, responsables y cercanas a las personas, promoviendo el acceso a la justicia y la rendición de cuentas.</p>
-            <div class="ods-rel">
-              <span class="ods-rel-icon">🕊️</span>
-              📌 <strong>Relación con el proyecto:</strong> Permite que la población tenga información clara y accesible sobre el suministro de agua, evitando la desinformación y conflictos derivados de la falta de comunicación entre autoridades y vecinos.
-            </div>
-          </div>
-        </div>
+        <div class="ods-body"><div class="ods-body-inner">
+          <p>Construir instituciones más transparentes, responsables y cercanas a las personas.</p>
+          <div class="ods-rel"><span class="ods-rel-icon">🕊️</span>📌 <strong>Relación con el proyecto:</strong> Permite información clara sobre el suministro, evitando desinformación y conflictos.</div>
+        </div></div>
       </div>
-
       <div class="ods-card" id="ods17" style="--ods-color:#19486A">
         <div class="ods-head" onclick="toggleOds('ods17')">
           <div class="ods-counter">6.</div>
@@ -809,17 +930,11 @@ html,body{height:100%;overflow:hidden;font-family:var(--FONT);background:var(--B
           <div class="ods-name">Alianzas para Lograr los Objetivos</div>
           <div class="ods-chevron">▼</div>
         </div>
-        <div class="ods-body">
-          <div class="ods-body-inner">
-            <p>Requiere la colaboración entre diferentes sectores para funcionar de manera efectiva: autoridades del servicio de agua, desarrolladores de tecnología, escuelas, organizaciones y la comunidad en general.</p>
-            <div class="ods-rel">
-              <span class="ods-rel-icon">🤝</span>
-              📌 <strong>Relación con el proyecto:</strong> Estas alianzas permiten compartir información, recursos y apoyo para resolver el problema del desperdicio de agua. La participación de la comunidad en los cuatro municipios es fundamental.
-            </div>
-          </div>
-        </div>
+        <div class="ods-body"><div class="ods-body-inner">
+          <p>Colaboración entre autoridades, tecnología, escuelas, organizaciones y comunidad.</p>
+          <div class="ods-rel"><span class="ods-rel-icon">🤝</span>📌 <strong>Relación con el proyecto:</strong> La participación de la comunidad en los cuatro municipios es fundamental para resolver el desperdicio de agua.</div>
+        </div></div>
       </div>
-
     </div>
     <div class="pol-sep"></div>
     <div class="pol-footer">GuardAgua · Aguascalientes · San Francisco de los Romo · Jesús María · El Llano · Agenda ONU 2030</div>
@@ -828,81 +943,92 @@ html,body{height:100%;overflow:hidden;font-family:var(--FONT);background:var(--B
 
 <script>
 // ══════════════════════════════════════════
-// DATA
+// DATA — Coordenadas corregidas
+// San Francisco de los Romo: lat ~22.07, lng ~-102.27
+// (municipio real, al norte de la capital)
 // ══════════════════════════════════════════
 const COLONIES_RAW = [
-{id:1,name:"San Marcos",lat:21.8794,lng:-102.2972,zone:"Centro"},
-{id:2,name:"Jardines de la Asunción",lat:21.8679,lng:-102.2941,zone:"Sur"},
-{id:3,name:"Bosques del Prado",lat:21.8995,lng:-102.2868,zone:"Norte"},
-{id:4,name:"Ojocaliente",lat:21.8523,lng:-102.2467,zone:"Oriente"},
-{id:5,name:"Pilar Blanco",lat:21.8448,lng:-102.3045,zone:"Sur"},
-{id:6,name:"Morelos",lat:21.8762,lng:-102.3280,zone:"Poniente"},
-{id:7,name:"Insurgentes",lat:21.8892,lng:-102.2698,zone:"Oriente"},
-{id:8,name:"Las Américas",lat:21.8717,lng:-102.2860,zone:"Centro"},
-{id:9,name:"Altavista",lat:21.8878,lng:-102.3102,zone:"Centro"},
-{id:10,name:"Del Valle",lat:21.8920,lng:-102.3030,zone:"Centro"},
-{id:11,name:"Gremial",lat:21.8955,lng:-102.2985,zone:"Centro"},
-{id:12,name:"La Estrella",lat:21.8840,lng:-102.3170,zone:"Poniente"},
-{id:13,name:"España",lat:21.8570,lng:-102.3000,zone:"Sur"},
-{id:14,name:"Fundición",lat:21.8780,lng:-102.3210,zone:"Poniente"},
-{id:15,name:"Circunvalación Norte",lat:21.9100,lng:-102.2960,zone:"Norte"},
-{id:16,name:"Los Bosques",lat:21.9210,lng:-102.2920,zone:"Norte"},
-{id:17,name:"Las Hadas",lat:21.9120,lng:-102.2810,zone:"Norte"},
-{id:18,name:"Trojes de Alonso",lat:21.9360,lng:-102.3010,zone:"Norte"},
-{id:19,name:"Villa Teresa",lat:21.9050,lng:-102.2750,zone:"Norte"},
-{id:20,name:"Villas de Nuestra Señora de la Asunción",lat:21.9275,lng:-102.2508,zone:"Oriente"},
-{id:21,name:"Lomas del Ajedrez",lat:21.8350,lng:-102.2840,zone:"Sur"},
-{id:22,name:"José López Portillo",lat:21.8500,lng:-102.2750,zone:"Oriente"},
-{id:23,name:"Palomino Dena",lat:21.8600,lng:-102.2600,zone:"Oriente"},
-{id:24,name:"Municipio Libre",lat:21.8450,lng:-102.2580,zone:"Oriente"},
-{id:25,name:"J. Guadalupe Peralta",lat:21.8420,lng:-102.2480,zone:"Oriente"},
-{id:26,name:"Cumbres",lat:21.9050,lng:-102.3250,zone:"Poniente"},
-{id:27,name:"La Herradura",lat:21.8900,lng:-102.3340,zone:"Poniente"},
-{id:28,name:"Canteras de San Javier",lat:21.9020,lng:-102.3400,zone:"Poniente"},
-{id:29,name:"Canteras de Santa Imelda",lat:21.8980,lng:-102.3450,zone:"Poniente"},
-{id:30,name:"Valle del Campestre",lat:21.9180,lng:-102.3100,zone:"Norte"},
-{id:31,name:"Pulgas Pandas",lat:21.9300,lng:-102.3200,zone:"Norte"},
-{id:32,name:"Campestre",lat:21.9150,lng:-102.3050,zone:"Norte"},
-{id:33,name:"Ferronales",lat:21.8970,lng:-102.3150,zone:"Poniente"},
-{id:34,name:"Primo Verdad",lat:21.8810,lng:-102.2890,zone:"Centro"},
-{id:35,name:"Martínez Domínguez",lat:21.8700,lng:-102.2760,zone:"Oriente"},
-{id:36,name:"Miravalle",lat:21.8720,lng:-102.3320,zone:"Poniente"},
-{id:37,name:"La Soledad",lat:21.8850,lng:-102.3380,zone:"Poniente"},
-{id:38,name:"Versalles",lat:21.8740,lng:-102.3020,zone:"Centro"},
-{id:39,name:"Panorama",lat:21.8880,lng:-102.3040,zone:"Centro"},
-{id:40,name:"Colinas del Río",lat:21.9100,lng:-102.3400,zone:"Poniente"},
-// ── San Francisco de los Romo (San Pancho) ──
-{id:41,name:"Centro — San Pancho",lat:21.8350,lng:-102.4080,zone:"San Francisco de los Romo"},
-{id:42,name:"El Sauz",lat:21.8280,lng:-102.4150,zone:"San Francisco de los Romo"},
-{id:43,name:"La Palma",lat:21.8420,lng:-102.4010,zone:"San Francisco de los Romo"},
-{id:44,name:"Lomas de San Francisco",lat:21.8470,lng:-102.4090,zone:"San Francisco de los Romo"},
-{id:45,name:"Villas de San Francisco",lat:21.8390,lng:-102.3950,zone:"San Francisco de los Romo"},
-{id:46,name:"El Refugio",lat:21.8310,lng:-102.4050,zone:"San Francisco de los Romo"},
-{id:47,name:"La Loma",lat:21.8450,lng:-102.4130,zone:"San Francisco de los Romo"},
-{id:48,name:"Jardines de San Francisco",lat:21.8360,lng:-102.3990,zone:"San Francisco de los Romo"},
-{id:49,name:"Nueva Esperanza",lat:21.8300,lng:-102.4110,zone:"San Francisco de los Romo"},
-{id:50,name:"Los Mezquites",lat:21.8490,lng:-102.4060,zone:"San Francisco de los Romo"},
-// ── Jesús María ──
-{id:51,name:"Centro — Jesús María",lat:21.9648,lng:-102.3432,zone:"Jesús María"},
-{id:52,name:"Las Margaritas",lat:21.9580,lng:-102.3370,zone:"Jesús María"},
-{id:53,name:"El Encino",lat:21.9700,lng:-102.3500,zone:"Jesús María"},
-{id:54,name:"Paseos del Vergel",lat:21.9720,lng:-102.3290,zone:"Jesús María"},
-{id:55,name:"Lomas de Jesús María",lat:21.9640,lng:-102.3550,zone:"Jesús María"},
-{id:56,name:"San Antonio",lat:21.9560,lng:-102.3480,zone:"Jesús María"},
-{id:57,name:"El Vergel",lat:21.9780,lng:-102.3410,zone:"Jesús María"},
-{id:58,name:"Las Trojes",lat:21.9510,lng:-102.3320,zone:"Jesús María"},
-{id:59,name:"La Joya",lat:21.9690,lng:-102.3600,zone:"Jesús María"},
-{id:60,name:"Villas del Sol",lat:21.9620,lng:-102.3250,zone:"Jesús María"},
-// ── El Llano ──
-{id:61,name:"Cabecera — El Llano",lat:21.9210,lng:-102.0190,zone:"El Llano"},
-{id:62,name:"La Loma del Trigo",lat:21.9150,lng:-102.0140,zone:"El Llano"},
-{id:63,name:"Los Arquitos",lat:21.9280,lng:-102.0230,zone:"El Llano"},
-{id:64,name:"El Potrero",lat:21.9100,lng:-102.0270,zone:"El Llano"},
-{id:65,name:"Las Pilas",lat:21.9330,lng:-102.0160,zone:"El Llano"},
-{id:66,name:"Rancho Nuevo",lat:21.9060,lng:-102.0100,zone:"El Llano"},
-{id:67,name:"San José de la Montaña",lat:21.9400,lng:-102.0300,zone:"El Llano"},
-{id:68,name:"El Mezquite",lat:21.9190,lng:-102.0350,zone:"El Llano"}
+  // ── Ciudad de Aguascalientes ──
+  {id:1,name:"San Marcos",lat:21.8794,lng:-102.2972,zone:"Centro",muni:"Aguascalientes"},
+  {id:2,name:"Jardines de la Asunción",lat:21.8679,lng:-102.2941,zone:"Sur",muni:"Aguascalientes"},
+  {id:3,name:"Bosques del Prado",lat:21.8995,lng:-102.2868,zone:"Norte",muni:"Aguascalientes"},
+  {id:4,name:"Ojocaliente",lat:21.8523,lng:-102.2467,zone:"Oriente",muni:"Aguascalientes"},
+  {id:5,name:"Pilar Blanco",lat:21.8448,lng:-102.3045,zone:"Sur",muni:"Aguascalientes"},
+  {id:6,name:"Morelos",lat:21.8762,lng:-102.3280,zone:"Poniente",muni:"Aguascalientes"},
+  {id:7,name:"Insurgentes",lat:21.8892,lng:-102.2698,zone:"Oriente",muni:"Aguascalientes"},
+  {id:8,name:"Las Américas",lat:21.8717,lng:-102.2860,zone:"Centro",muni:"Aguascalientes"},
+  {id:9,name:"Altavista",lat:21.8878,lng:-102.3102,zone:"Centro",muni:"Aguascalientes"},
+  {id:10,name:"Del Valle",lat:21.8920,lng:-102.3030,zone:"Centro",muni:"Aguascalientes"},
+  {id:11,name:"Gremial",lat:21.8955,lng:-102.2985,zone:"Centro",muni:"Aguascalientes"},
+  {id:12,name:"La Estrella",lat:21.8840,lng:-102.3170,zone:"Poniente",muni:"Aguascalientes"},
+  {id:13,name:"España",lat:21.8570,lng:-102.3000,zone:"Sur",muni:"Aguascalientes"},
+  {id:14,name:"Fundición",lat:21.8780,lng:-102.3210,zone:"Poniente",muni:"Aguascalientes"},
+  {id:15,name:"Circunvalación Norte",lat:21.9100,lng:-102.2960,zone:"Norte",muni:"Aguascalientes"},
+  {id:16,name:"Los Bosques",lat:21.9210,lng:-102.2920,zone:"Norte",muni:"Aguascalientes"},
+  {id:17,name:"Las Hadas",lat:21.9120,lng:-102.2810,zone:"Norte",muni:"Aguascalientes"},
+  {id:18,name:"Trojes de Alonso",lat:21.9360,lng:-102.3010,zone:"Norte",muni:"Aguascalientes"},
+  {id:19,name:"Villa Teresa",lat:21.9050,lng:-102.2750,zone:"Norte",muni:"Aguascalientes"},
+  {id:20,name:"Villas de Nuestra Señora",lat:21.9275,lng:-102.2508,zone:"Oriente",muni:"Aguascalientes"},
+  {id:21,name:"Lomas del Ajedrez",lat:21.8350,lng:-102.2840,zone:"Sur",muni:"Aguascalientes"},
+  {id:22,name:"José López Portillo",lat:21.8500,lng:-102.2750,zone:"Oriente",muni:"Aguascalientes"},
+  {id:23,name:"Palomino Dena",lat:21.8600,lng:-102.2600,zone:"Oriente",muni:"Aguascalientes"},
+  {id:24,name:"Municipio Libre",lat:21.8450,lng:-102.2580,zone:"Oriente",muni:"Aguascalientes"},
+  {id:25,name:"J. Guadalupe Peralta",lat:21.8420,lng:-102.2480,zone:"Oriente",muni:"Aguascalientes"},
+  {id:26,name:"Cumbres",lat:21.9050,lng:-102.3250,zone:"Poniente",muni:"Aguascalientes"},
+  {id:27,name:"La Herradura",lat:21.8900,lng:-102.3340,zone:"Poniente",muni:"Aguascalientes"},
+  {id:28,name:"Canteras de San Javier",lat:21.9020,lng:-102.3400,zone:"Poniente",muni:"Aguascalientes"},
+  {id:29,name:"Canteras de Santa Imelda",lat:21.8980,lng:-102.3450,zone:"Poniente",muni:"Aguascalientes"},
+  {id:30,name:"Valle del Campestre",lat:21.9180,lng:-102.3100,zone:"Norte",muni:"Aguascalientes"},
+  {id:31,name:"Pulgas Pandas",lat:21.9300,lng:-102.3200,zone:"Norte",muni:"Aguascalientes"},
+  {id:32,name:"Campestre",lat:21.9150,lng:-102.3050,zone:"Norte",muni:"Aguascalientes"},
+  {id:33,name:"Ferronales",lat:21.8970,lng:-102.3150,zone:"Poniente",muni:"Aguascalientes"},
+  {id:34,name:"Primo Verdad",lat:21.8810,lng:-102.2890,zone:"Centro",muni:"Aguascalientes"},
+  {id:35,name:"Martínez Domínguez",lat:21.8700,lng:-102.2760,zone:"Oriente",muni:"Aguascalientes"},
+  {id:36,name:"Miravalle",lat:21.8720,lng:-102.3320,zone:"Poniente",muni:"Aguascalientes"},
+  {id:37,name:"La Soledad",lat:21.8850,lng:-102.3380,zone:"Poniente",muni:"Aguascalientes"},
+  {id:38,name:"Versalles",lat:21.8740,lng:-102.3020,zone:"Centro",muni:"Aguascalientes"},
+  {id:39,name:"Panorama",lat:21.8880,lng:-102.3040,zone:"Centro",muni:"Aguascalientes"},
+  {id:40,name:"Colinas del Río",lat:21.9100,lng:-102.3400,zone:"Poniente",muni:"Aguascalientes"},
+  // ── San Francisco de los Romo (coordenadas reales: ~22.07 lat, -102.27 lng) ──
+  {id:41,name:"Centro",lat:22.0724,lng:-102.2727,zone:"San Pancho",muni:"San Francisco de los Romo"},
+  {id:42,name:"El Sauz",lat:22.0680,lng:-102.2680,zone:"San Pancho",muni:"San Francisco de los Romo"},
+  {id:43,name:"La Palma",lat:22.0760,lng:-102.2780,zone:"San Pancho",muni:"San Francisco de los Romo"},
+  {id:44,name:"Lomas de San Francisco",lat:22.0800,lng:-102.2740,zone:"San Pancho",muni:"San Francisco de los Romo"},
+  {id:45,name:"Villas de San Francisco",lat:22.0700,lng:-102.2650,zone:"San Pancho",muni:"San Francisco de los Romo"},
+  {id:46,name:"El Refugio",lat:22.0660,lng:-102.2760,zone:"San Pancho",muni:"San Francisco de los Romo"},
+  {id:47,name:"La Loma",lat:22.0750,lng:-102.2800,zone:"San Pancho",muni:"San Francisco de los Romo"},
+  {id:48,name:"Jardines de San Francisco",lat:22.0710,lng:-102.2700,zone:"San Pancho",muni:"San Francisco de los Romo"},
+  {id:49,name:"Nueva Esperanza",lat:22.0640,lng:-102.2730,zone:"San Pancho",muni:"San Francisco de los Romo"},
+  {id:50,name:"Los Mezquites",lat:22.0820,lng:-102.2760,zone:"San Pancho",muni:"San Francisco de los Romo"},
+  // ── Jesús María ──
+  {id:51,name:"Centro",lat:21.9648,lng:-102.3432,zone:"Jesús María",muni:"Jesús María"},
+  {id:52,name:"Las Margaritas",lat:21.9580,lng:-102.3370,zone:"Jesús María",muni:"Jesús María"},
+  {id:53,name:"El Encino",lat:21.9700,lng:-102.3500,zone:"Jesús María",muni:"Jesús María"},
+  {id:54,name:"Paseos del Vergel",lat:21.9720,lng:-102.3290,zone:"Jesús María",muni:"Jesús María"},
+  {id:55,name:"Lomas de Jesús María",lat:21.9640,lng:-102.3550,zone:"Jesús María",muni:"Jesús María"},
+  {id:56,name:"San Antonio",lat:21.9560,lng:-102.3480,zone:"Jesús María",muni:"Jesús María"},
+  {id:57,name:"El Vergel",lat:21.9780,lng:-102.3410,zone:"Jesús María",muni:"Jesús María"},
+  {id:58,name:"Las Trojes",lat:21.9510,lng:-102.3320,zone:"Jesús María",muni:"Jesús María"},
+  {id:59,name:"La Joya",lat:21.9690,lng:-102.3600,zone:"Jesús María",muni:"Jesús María"},
+  {id:60,name:"Villas del Sol",lat:21.9620,lng:-102.3250,zone:"Jesús María",muni:"Jesús María"},
+  // ── El Llano ──
+  {id:61,name:"Cabecera",lat:21.9210,lng:-102.0190,zone:"El Llano",muni:"El Llano"},
+  {id:62,name:"La Loma del Trigo",lat:21.9150,lng:-102.0140,zone:"El Llano",muni:"El Llano"},
+  {id:63,name:"Los Arquitos",lat:21.9280,lng:-102.0230,zone:"El Llano",muni:"El Llano"},
+  {id:64,name:"El Potrero",lat:21.9100,lng:-102.0270,zone:"El Llano",muni:"El Llano"},
+  {id:65,name:"Las Pilas",lat:21.9330,lng:-102.0160,zone:"El Llano",muni:"El Llano"},
+  {id:66,name:"Rancho Nuevo",lat:21.9060,lng:-102.0100,zone:"El Llano",muni:"El Llano"},
+  {id:67,name:"San José de la Montaña",lat:21.9400,lng:-102.0300,zone:"El Llano",muni:"El Llano"},
+  {id:68,name:"El Mezquite",lat:21.9190,lng:-102.0350,zone:"El Llano",muni:"El Llano"}
 ];
+
+// Colores por municipio para el selector
+const MUNI_COLORS = {
+  "Aguascalientes":      "rgba(79,179,191,.15)",
+  "San Francisco de los Romo":"rgba(217,160,91,.15)",
+  "Jesús María":         "rgba(93,162,113,.15)",
+  "El Llano":            "rgba(197,107,92,.15)",
+};
 
 // ══════════════════════════════════════════
 // STATE
@@ -936,44 +1062,73 @@ const neighbors = (id,km=2.5) => COLONIES_RAW.filter(o=>{
 }).map(o=>o.id);
 
 // ══════════════════════════════════════════
+// SPLASH PARTICLES
+// ══════════════════════════════════════════
+function createSplashParticles(){
+  const container=document.getElementById('sbg');
+  const emojis=['💧','🌊','💦','⚡','🔵'];
+  for(let i=0;i<18;i++){
+    const p=document.createElement('div');
+    p.className='sbp';
+    const size=8+Math.random()*20;
+    const emoji=emojis[Math.floor(Math.random()*emojis.length)];
+    p.textContent=emoji;
+    p.style.cssText=`
+      left:${Math.random()*100}%;
+      font-size:${size}px;
+      animation-duration:${6+Math.random()*10}s;
+      animation-delay:${Math.random()*8}s;
+      opacity:.4;
+    `;
+    container.appendChild(p);
+  }
+}
+
+// ══════════════════════════════════════════
 // MAP
 // ══════════════════════════════════════════
 function initMap(){
-  S.map = L.map('map',{center:[21.885,-102.296],zoom:12,zoomControl:false});
+  // Centro del mapa: punto medio entre todos los municipios
+  S.map = L.map('map',{center:[21.97,-102.29],zoom:10,zoomControl:false});
   L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png',{attribution:'© CARTO',subdomains:'abcd',maxZoom:19}).addTo(S.map);
   L.control.zoom({position:'bottomright'}).addTo(S.map);
   COLONIES_RAW.forEach(c => drawColony(c.id));
   S.map.on('click', e => {
     let closest=null,minD=Infinity;
     COLONIES_RAW.forEach(c=>{const d=haversine(e.latlng.lat,e.latlng.lng,c.lat,c.lng);if(d<minD){minD=d;closest=c;}});
-    if(closest && minD<3) showPopup(closest.id);
+    if(closest && minD<4) showPopup(closest.id);
   });
 }
 
-// Colores naturales por estado
 function colonyColor(id){
   const c=S.colonies[id];
-  if(!c.hasWater) return {fill:'#C56B5C',glow:'rgba(197,107,92,.6)',border:'#A8564A'};
-  if(c.riskLevel>0) return {fill:'#D9A05B',glow:'rgba(217,160,91,.6)',border:'#BE8642'};
-  return {fill:'#5DA271',glow:'rgba(93,162,113,.6)',border:'#4E8C5E'};
+  if(!c.hasWater) return {fill:'#C56B5C',glow:'rgba(197,107,92,.65)',border:'#A8564A'};
+  if(c.riskLevel>0) return {fill:'#D9A05B',glow:'rgba(217,160,91,.65)',border:'#BE8642'};
+  return {fill:'#5DA271',glow:'rgba(93,162,113,.65)',border:'#4E8C5E'};
 }
 
 function drawColony(id){
   const c=S.colonies[id];
   const isUser=id===S.userColony;
   const col=colonyColor(id);
-  const sz=isUser?22:16;
+  const sz=isUser?24:16;
+
   if(S.markers[id]) S.map.removeLayer(S.markers[id]);
   if(S.circles[id]) S.map.removeLayer(S.circles[id]);
 
-  const circle=L.circle([c.lat,c.lng],{radius:900,color:col.border,fillColor:col.fill,fillOpacity:0.12,weight:1,opacity:0.4}).addTo(S.map);
+  const circle=L.circle([c.lat,c.lng],{radius:900,color:col.border,fillColor:col.fill,fillOpacity:0.13,weight:1,opacity:0.45}).addTo(S.map);
   circle.on('click',()=>showPopup(id));
   S.circles[id]=circle;
 
-  const anim=isUser?'animation:pusr 1.8s infinite;':'';
+  const pulseStyle=isUser?'animation:pusr 1.8s infinite;':'';
+  const outerGlow=isUser?`box-shadow:0 0 0 6px rgba(79,179,191,.15),0 0 ${sz+8}px ${col.glow},0 3px 10px rgba(0,0,0,.5);`
+    :`box-shadow:0 0 ${sz-4}px ${col.glow},0 2px 6px rgba(0,0,0,.4);`;
+  const borderStyle=isUser?'border:2.5px solid rgba(79,179,191,.9);':'border:2px solid '+col.border+';';
+
   const icon=L.divIcon({
     className:'',
-    html:`<div style="width:${sz}px;height:${sz}px;border-radius:50%;background:radial-gradient(circle,${col.fill}EE,${col.fill}88);border:2px solid ${isUser?'#fff':col.border};box-shadow:0 0 ${isUser?16:10}px ${col.glow},0 2px 6px rgba(0,0,0,.4);cursor:pointer;${anim}transition:all .6s;"></div>`,
+    html:`<div style="width:${sz}px;height:${sz}px;border-radius:50%;background:radial-gradient(circle at 35% 35%,${col.fill}FF,${col.fill}88);${borderStyle}${outerGlow}${pulseStyle}cursor:pointer;transition:all .6s;position:relative;">
+      ${isUser?`<div style="position:absolute;inset:-4px;border-radius:50%;border:1px solid rgba(79,179,191,.3);animation:expandRing 2.5s ease-out infinite;"></div>`:''}</div>`,
     iconSize:[sz,sz],iconAnchor:[sz/2,sz/2],
   });
   const mk=L.marker([c.lat,c.lng],{icon,zIndexOffset:isUser?100:0}).addTo(S.map).on('click',()=>showPopup(id));
@@ -985,23 +1140,24 @@ function showPopup(id){
   const stTxt=c.hasWater?(c.riskLevel>0?'⚠️ Con agua / En riesgo':'💧 Agua disponible'):'🚫 Sin suministro';
   const stColor=c.hasWater?(c.riskLevel>0?'#D9A05B':'#5DA271'):'#E08A7B';
   const eta=!c.hasWater && c.estReturn
-    ? `<div style="color:var(--O);font-size:.76rem;margin-top:7px;">⏳ Regreso estimado: <strong>${fmt(c.estReturn)}</strong></div>`
+    ? `<div style="color:#D9A05B;font-size:.76rem;margin-top:7px;">⏳ Regreso estimado: <strong>${fmt(c.estReturn)}</strong></div>`
     : (c.hasWater && c.estGone
-      ? `<div style="color:var(--O);font-size:.76rem;margin-top:7px;">⚠️ Posible corte: <strong>${fmt(c.estGone)}</strong></div>` : '');
+      ? `<div style="color:#D9A05B;font-size:.76rem;margin-top:7px;">⚠️ Posible corte: <strong>${fmt(c.estGone)}</strong></div>` : '');
   const isMine=id===S.userColony;
+  const muniLabel=`<span style="background:rgba(79,179,191,.12);color:#4FB3BF;padding:1px 7px;border-radius:6px;font-size:.63rem;margin-left:5px;">${c.muni}</span>`;
   const distText = S.userColony && !isMine
-    ? `<div style="color:var(--T3);font-size:.68rem;margin-top:5px;">📏 ${haversine(S.colonies[S.userColony].lat,S.colonies[S.userColony].lng,c.lat,c.lng).toFixed(1)} km de tu colonia</div>` : '';
+    ? `<div style="color:rgba(234,241,242,.36);font-size:.68rem;margin-top:5px;">📏 ${haversine(S.colonies[S.userColony].lat,S.colonies[S.userColony].lng,c.lat,c.lng).toFixed(1)} km de tu colonia</div>` : '';
 
   L.popup({closeButton:true}).setLatLng([c.lat,c.lng]).setContent(`
-    <div style="color:var(--T1);min-width:190px">
-      <div style="font-weight:800;font-size:.95rem;margin-bottom:5px;">
-        ${c.name}
-        ${isMine?'<span style="background:rgba(var(--C-RGB),.2);color:var(--C);padding:1px 7px;border-radius:8px;font-size:.65rem;margin-left:5px;">MI COLONIA</span>':''}
+    <div style="color:#EAF1F2;min-width:200px">
+      <div style="font-weight:800;font-size:.95rem;margin-bottom:6px;line-height:1.3;">
+        ${c.name} ${muniLabel}
+        ${isMine?'<span style="background:rgba(79,179,191,.2);color:#4FB3BF;padding:1px 7px;border-radius:8px;font-size:.62rem;margin-left:4px;">MI COLONIA</span>':''}
       </div>
-      <div style="color:${stColor};font-weight:600;font-size:.84rem;">${stTxt}</div>
-      <div style="color:var(--T3);font-size:.7rem;margin-top:5px;">Zona ${c.zone} · ${fmt(c.lastChange)}</div>
+      <div style="color:${stColor};font-weight:700;font-size:.85rem;">${stTxt}</div>
+      <div style="color:rgba(234,241,242,.36);font-size:.7rem;margin-top:5px;">Zona ${c.zone} · ${fmt(c.lastChange)}</div>
       ${eta}${distText}
-      ${!isMine?`<button onclick="setColony(${id});S.map.closePopup()" style="margin-top:11px;width:100%;background:rgba(var(--C-RGB),.18);border:1px solid rgba(var(--C-RGB),.4);color:var(--C);padding:7px;border-radius:8px;cursor:pointer;font-size:.76rem;font-family:var(--FONT);font-weight:600;">📍 Esta es mi colonia</button>`:''}
+      ${!isMine?`<button onclick="setColony(${id});S.map.closePopup()" style="margin-top:12px;width:100%;background:rgba(79,179,191,.18);border:1px solid rgba(79,179,191,.4);color:#4FB3BF;padding:8px;border-radius:9px;cursor:pointer;font-size:.77rem;font-family:'Outfit',sans-serif;font-weight:700;transition:all .2s;">📍 Esta es mi colonia</button>`:''}
     </div>`).openOn(S.map);
 }
 
@@ -1031,25 +1187,24 @@ function selectFromList(v){ if(!v) return; setColony(parseInt(v)); closeModal();
 function setColony(id){
   S.userColony=id;
   const c=S.colonies[id];
-  document.getElementById('nav-colony').textContent=c.name;
+  document.getElementById('nav-colony').textContent=c.name+(c.muni!=='Aguascalientes'?' · '+c.muni:'');
   COLONIES_RAW.forEach(x=>drawColony(x.id));
   updateSC();
-  S.map.flyTo([c.lat,c.lng],14,{animate:true,duration:1.6});
+  S.map.flyTo([c.lat,c.lng],14,{animate:true,duration:1.8});
 
-  // ── MENSAJE CLARO POR COLONIA ──
   if(c.hasWater && c.riskLevel===0){
-    notify('water-on',`💧 Hay agua en ${c.name}`,`Buenas noticias: la colonia ${c.name} (Zona ${c.zone}) tiene suministro de agua desde las ${fmt(c.lastChange)}.`,true);
+    notify('water-on',`💧 Hay agua en ${c.name}`,`La colonia ${c.name} (${c.muni}) tiene suministro desde las ${fmt(c.lastChange)}.`,true);
   } else if(c.hasWater && c.riskLevel>0){
-    notify('risk',`⚠️ Riesgo en ${c.name}`,`La colonia ${c.name} aún tiene agua, pero podría sufrir un corte pronto por afectaciones cercanas.`,true);
+    notify('risk',`⚠️ Riesgo en ${c.name}`,`${c.name} aún tiene agua, pero podría sufrir un corte pronto.`,true);
   } else {
-    notify('water-off',`🚫 No hay agua en ${c.name}`,`La colonia ${c.name} (Zona ${c.zone}) no tiene suministro${c.estReturn?`. Regreso estimado: ${fmt(c.estReturn)}`:''}. Te avisaremos cuando regrese.`,true);
+    notify('water-off',`🚫 No hay agua en ${c.name}`,`${c.name} (${c.muni}) no tiene suministro${c.estReturn?`. Regreso estimado: ${fmt(c.estReturn)}`:''}. Te avisaremos cuando regrese.`,true);
   }
   updateAll();
 }
 function centerUser(){
   if(!S.userColony){openModal();return;}
   const c=S.colonies[S.userColony];
-  S.map.flyTo([c.lat,c.lng],14,{animate:true,duration:1.2});
+  S.map.flyTo([c.lat,c.lng],14,{animate:true,duration:1.3});
 }
 
 // ══════════════════════════════════════════
@@ -1066,7 +1221,7 @@ function updateSC(){
   const etaV=document.getElementById('sc-eta-val');
 
   document.getElementById('sc-name').textContent=c.name;
-  document.getElementById('sc-time').textContent=`Zona ${c.zone} · act. ${fmt(c.lastChange)}`;
+  document.getElementById('sc-time').textContent=`${c.muni} · act. ${fmt(c.lastChange)}`;
 
   if(c.hasWater && c.riskLevel===0){
     sc.className='sc on'; icon.className='sc-icon on'; icon.textContent='💧';
@@ -1082,7 +1237,7 @@ function updateSC(){
   } else {
     sc.className='sc off'; icon.className='sc-icon off'; icon.textContent='🚫';
     badge.className='sc-badge off'; badge.textContent='✗ NO HAY AGUA';
-    msg.textContent=`No hay agua en ${c.name}. El suministro se cortó a las ${fmt(c.lastChange)}. Recibirás una alerta cuando regrese.`;
+    msg.textContent=`No hay agua en ${c.name}. Cortado a las ${fmt(c.lastChange)}. Recibirás una alerta cuando regrese.`;
     if(c.estReturn){eta.style.display='block';eta.querySelector('.sc-eta-label').textContent='⏳ Estimado de regreso:';etaV.className='sc-eta-val green';etaV.textContent=fmtRemain(c.estReturn);}
     else eta.style.display='none';
   }
@@ -1093,7 +1248,7 @@ function updateSC(){
 // ══════════════════════════════════════════
 function addEvent(type,id,msg){
   const c=S.colonies[id];
-  S.events.unshift({type,name:c.name,zone:c.zone,msg,time:new Date()});
+  S.events.unshift({type,name:c.name,zone:c.zone,muni:c.muni,msg,time:new Date()});
   if(S.events.length>120) S.events.pop();
 }
 
@@ -1101,29 +1256,24 @@ function triggerWater(id,hasWater){
   const c=S.colonies[id];
   const now=new Date();
   c.hasWater=hasWater; c.lastChange=now; c.riskLevel=0; c.estGone=null;
-
   if(hasWater){
     c.estReturn=null;
-    addEvent('on',id,`<strong>${c.name}</strong> — el agua regresó a las ${fmt(now)}`);
-    if(id===S.userColony){
-      notify('water-on',`💧 ¡Ya hay agua en ${c.name}!`,`El agua regresó a tu colonia ${c.name} a las ${fmt(now)}.`,true);
-      spawnParticles('💧');
-    }
+    addEvent('on',id,`<strong>${c.name}</strong> (${c.muni}) — el agua regresó a las ${fmt(now)}`);
+    if(id===S.userColony){notify('water-on',`💧 ¡Ya hay agua en ${c.name}!`,`El agua regresó a tu colonia a las ${fmt(now)}.`,true);spawnParticles('💧');}
+    if(isNearUser(id)) sendPushNotification('on',c.name,id===S.userColony?`El agua regresó a tu colonia a las ${fmt(now)}.`:`El agua regresó a ${c.name} (cerca de ti) a las ${fmt(now)}.`);
   } else {
     c.estReturn=new Date(now.getTime()+(1.2+Math.random()*3.8)*3600000);
-    addEvent('off',id,`<strong>${c.name}</strong> — se fue el agua a las ${fmt(now)}`);
-    if(id===S.userColony)
-      notify('water-off',`🚫 Se fue el agua en ${c.name}`,`El agua se cortó en tu colonia ${c.name} a las ${fmt(now)}. Regreso estimado: ${fmt(c.estReturn)}.`,true);
-
+    addEvent('off',id,`<strong>${c.name}</strong> (${c.muni}) — se fue el agua a las ${fmt(now)}`);
+    if(id===S.userColony) notify('water-off',`🚫 Se fue el agua en ${c.name}`,`El agua se cortó a las ${fmt(now)}. Regreso estimado: ${fmt(c.estReturn)}.`,true);
+    if(isNearUser(id)) sendPushNotification('off',c.name,id===S.userColony?`El agua se cortó en tu colonia. Regreso estimado: ${fmt(c.estReturn)}.`:`Corte de agua en ${c.name} (cerca de ti).`);
     neighbors(id,2.5).forEach(nid=>{
       const nb=S.colonies[nid];
       if(nb.hasWater && Math.random()<0.5){
         const delay=(6+Math.random()*24)*60000;
-        nb.riskLevel=2;
-        nb.estGone=new Date(now.getTime()+delay);
+        nb.riskLevel=2;nb.estGone=new Date(now.getTime()+delay);
         addEvent('risk',nid,`<strong>${nb.name}</strong> — riesgo de corte por afectación de ${c.name}`);
-        if(nid===S.userColony)
-          notify('risk',`⚠️ Riesgo en ${nb.name}`,`${nb.name} podría quedarse sin agua en ~${Math.round(delay/60000)} min por afectación en ${c.name}.`,true);
+        if(nid===S.userColony) notify('risk',`⚠️ Riesgo en ${nb.name}`,`${nb.name} podría quedarse sin agua en ~${Math.round(delay/60000)} min.`,true);
+        if(isNearUser(nid)) sendPushNotification('risk',nb.name,`${nb.name} podría quedarse sin agua en ~${Math.round(delay/60000)} min.`);
         drawColony(nid);
         setTimeout(()=>{if(nb.riskLevel>0&&nb.hasWater)triggerWater(nid,false);nb.riskLevel=0;},delay);
       }
@@ -1140,7 +1290,7 @@ function simLoop(){
   const c=S.colonies[id];
   if(!c.hasWater){if(Math.random()<0.65) triggerWater(id,true);}
   else {if(Math.random()<0.28) triggerWater(id,false);}
-  setTimeout(simLoop, 25000+Math.random()*55000);
+  setTimeout(simLoop,25000+Math.random()*55000);
 }
 
 // ══════════════════════════════════════════
@@ -1151,34 +1301,53 @@ function updateStats(){
   const on=vs.filter(c=>c.hasWater&&c.riskLevel===0).length;
   const off=vs.filter(c=>!c.hasWater).length;
   const risk=vs.filter(c=>c.hasWater&&c.riskLevel>0).length;
-  ['st-on','ms-on'].forEach(id=>document.getElementById(id).textContent=on);
-  ['st-off','ms-off'].forEach(id=>document.getElementById(id).textContent=off);
-  ['st-risk','ms-risk'].forEach(id=>document.getElementById(id).textContent=risk);
+  ['st-on','ms-on'].forEach(id=>{ const el=document.getElementById(id); if(el) animateNum(el,parseInt(el.textContent)||0,on); });
+  ['st-off','ms-off'].forEach(id=>{ const el=document.getElementById(id); if(el) animateNum(el,parseInt(el.textContent)||0,off); });
+  ['st-risk','ms-risk'].forEach(id=>{ const el=document.getElementById(id); if(el) animateNum(el,parseInt(el.textContent)||0,risk); });
 }
 
+function animateNum(el,from,to){
+  if(from===to){el.textContent=to;return;}
+  const steps=8,dur=400;
+  let step=0;
+  const t=setInterval(()=>{
+    step++;
+    el.textContent=Math.round(from+(to-from)*(step/steps));
+    if(step>=steps){el.textContent=to;clearInterval(t);}
+  },dur/steps);
+}
+
+// Agrupar colonias por municipio en la lista
 function buildColoniesTab(){
-  const sorted=[...COLONIES_RAW].sort((a,b)=>{
-    if(a.id===S.userColony) return -1;
-    if(b.id===S.userColony) return 1;
-    const ca=S.colonies[a.id],cb=S.colonies[b.id];
-    if(!ca.hasWater&&cb.hasWater) return -1;
-    if(ca.hasWater&&!cb.hasWater) return 1;
-    return a.name.localeCompare(b.name);
+  const munis=["Aguascalientes","San Francisco de los Romo","Jesús María","El Llano"];
+  let html='';
+  munis.forEach(muni=>{
+    const cols=COLONIES_RAW.filter(c=>c.muni===muni).sort((a,b)=>{
+      if(a.id===S.userColony) return -1;
+      if(b.id===S.userColony) return 1;
+      const ca=S.colonies[a.id],cb=S.colonies[b.id];
+      if(!ca.hasWater&&cb.hasWater) return -1;
+      if(ca.hasWater&&!cb.hasWater) return 1;
+      return a.name.localeCompare(b.name);
+    });
+    const muniColor=muni==="San Francisco de los Romo"?"var(--O)":muni==="Jesús María"?"var(--G)":muni==="El Llano"?"var(--R)":"var(--C)";
+    html+=`<div style="padding:8px 16px 4px;font-size:.62rem;letter-spacing:2px;text-transform:uppercase;color:${muniColor};background:rgba(0,0,0,.15);border-bottom:1px solid rgba(255,255,255,.04);font-weight:700;">${muni}</div>`;
+    html+=cols.map(cd=>{
+      const c=S.colonies[cd.id];
+      const dc=c.hasWater?(c.riskLevel>0?'risk':'on'):'off';
+      const st=c.hasWater?(c.riskLevel>0?'⚠️ En riesgo':'Hay agua'):`No hay agua${c.estReturn?' · reg. '+fmt(c.estReturn):''}`;
+      const isU=cd.id===S.userColony;
+      return `<div class="ci ${isU?'user':''}" onclick="focusC(${cd.id})">
+        <div class="cidot ${dc}"></div>
+        <div style="flex:1;min-width:0">
+          <div class="ci-name">${cd.name}${isU?' <span style="color:var(--C);font-size:.6rem;">●</span>':''}</div>
+          <div class="ci-detail">${st}</div>
+        </div>
+        <div class="ci-zone" style="font-size:.65rem">${c.zone}</div>
+      </div>`;
+    }).join('');
   });
-  return sorted.map(cd=>{
-    const c=S.colonies[cd.id];
-    const dc=c.hasWater?(c.riskLevel>0?'risk':'on'):'off';
-    const st=c.hasWater?(c.riskLevel>0?'⚠️ En riesgo':'Hay agua'):`No hay agua${c.estReturn?' · reg. '+fmt(c.estReturn):''}`;
-    const isU=cd.id===S.userColony;
-    return `<div class="ci ${isU?'user':''}" onclick="focusC(${cd.id})">
-      <div class="cidot ${dc}"></div>
-      <div style="flex:1;min-width:0">
-        <div class="ci-name">${cd.name}${isU?' <span style="color:var(--C);font-size:.6rem;">●</span>':''}</div>
-        <div class="ci-detail">${st}</div>
-      </div>
-      <div class="ci-zone">Z-${cd.zone}</div>
-    </div>`;
-  }).join('');
+  return html;
 }
 
 function buildEventsTab(){
@@ -1186,7 +1355,7 @@ function buildEventsTab(){
   return S.events.slice(0,40).map(ev=>`
     <div class="ei">
       <div class="ei-icon ${ev.type==='on'?'on':ev.type==='off'?'off':'risk'}">${ev.type==='on'?'💧':ev.type==='off'?'🚫':'⚠️'}</div>
-      <div><div class="ei-msg">${ev.msg}</div><div class="ei-time">${fmt(ev.time)} · Zona ${ev.zone}</div></div>
+      <div><div class="ei-msg">${ev.msg}</div><div class="ei-time">${fmt(ev.time)} · ${ev.muni||ev.zone}</div></div>
     </div>`).join('');
 }
 
@@ -1200,7 +1369,10 @@ function buildNearbyTab(){
     const impact=!c.hasWater?'<span style="color:#E08A7B;font-size:.68rem;">⚡ Influye en tu suministro</span>':(c.riskLevel>0?'<span style="color:var(--O);font-size:.68rem;">⚠️ En riesgo</span>':'<span style="color:var(--T3);font-size:.68rem;">Estado normal</span>');
     return `<div class="ci" onclick="focusC(${c.id})">
       <div class="cidot ${dc}"></div>
-      <div style="flex:1;min-width:0"><div class="ci-name">${c.name}</div><div style="margin-top:2px">${impact}</div></div>
+      <div style="flex:1;min-width:0">
+        <div class="ci-name">${c.name} <span style="color:var(--T3);font-size:.65rem;">${c.muni}</span></div>
+        <div style="margin-top:2px">${impact}</div>
+      </div>
       <div class="ci-zone">${dist.toFixed(1)}km</div>
     </div>`;
   }).join('');
@@ -1215,8 +1387,8 @@ function updateAll(){
 
 function focusC(id){
   const c=S.colonies[id];
-  S.map.flyTo([c.lat,c.lng],14,{animate:true,duration:1});
-  setTimeout(()=>showPopup(id),900);
+  S.map.flyTo([c.lat,c.lng],14,{animate:true,duration:1.1});
+  setTimeout(()=>showPopup(id),950);
 }
 
 // ══════════════════════════════════════════
@@ -1229,25 +1401,86 @@ function notify(type,title,body,auto){
   const el=document.createElement('div');
   el.className=`notif ${cls}`;
   el.innerHTML=`<div class="n-ico">${ico}</div>
-    <div style="flex:1"><div class="n-title">${title}</div><div class="n-body">${body}</div><div class="n-time">${now} · GuardAgua IoT</div></div>
-    <div class="n-close" onclick="this.closest('.notif').remove()">✕</div>`;
+    <div style="flex:1">
+      <div class="n-title">${title}</div>
+      <div class="n-body">${body}</div>
+      <div class="n-time">${now} · GuardAgua IoT</div>
+    </div>
+    <div class="n-close" onclick="dismissNotif(this)">✕</div>
+    ${auto?`<div class="n-progress"><div class="n-progress-bar"></div></div>`:''}`;
   document.getElementById('notifs').appendChild(el);
-  setTimeout(()=>el.classList.add('in'),30);
-  if(auto) setTimeout(()=>{el.classList.remove('in');setTimeout(()=>el.remove(),450)},6500);
+  requestAnimationFrame(()=>requestAnimationFrame(()=>el.classList.add('in')));
+  if(auto) setTimeout(()=>{el.classList.add('out');setTimeout(()=>el.remove(),500)},6500);
 }
+function dismissNotif(btn){
+  const el=btn.closest('.notif');
+  el.classList.add('out');
+  setTimeout(()=>el.remove(),500);
+}
+
+// ══════════════════════════════════════════
+// PUSH NOTIFICATIONS
+// ══════════════════════════════════════════
+function isNearUser(id){
+  if(!S.userColony) return false;
+  if(id===S.userColony) return true;
+  const u=S.colonies[S.userColony], c=S.colonies[id];
+  return haversine(u.lat,u.lng,c.lat,c.lng)<=2.5;
+}
+function requestNotificationPermission(){
+  if(!('Notification' in window)){notify('info','Navegador no compatible','Tu navegador no soporta notificaciones push.',true);updateNotifToggle();return;}
+  Notification.requestPermission().then(result=>{
+    if(result==='granted'){
+      localStorage.setItem('guardagua_notif','on');
+      try{const n=new Notification('✅ GuardAgua activado',{body:'Ahora recibirás alertas sobre el agua en tu colonia.',icon:'logo.jpg',tag:'guardagua-welcome'});n.onclick=()=>{window.focus();n.close();}}catch(e){}
+      notify('water-on','✅ Notificaciones activadas','Recibirás alertas push cuando el agua llegue o se corte.',true);
+    } else if(result==='denied'){
+      localStorage.setItem('guardagua_notif','off');
+      notify('risk','🔔 Notificaciones bloqueadas','Para activarlas, toca el ícono de candado 🔒 en la barra del navegador.',false);
+    }
+    updateNotifToggle();
+  });
+}
+function sendPushNotification(tipo,colonia,mensaje){
+  if(!('Notification' in window)) return;
+  if(localStorage.getItem('guardagua_notif')!=='on' || Notification.permission!=='granted') return;
+  let title,opts={icon:'logo.jpg'};
+  if(tipo==='on'){title='💧 ¡Llegó el agua! — '+colonia;opts.body=mensaje+' · GuardAgua';opts.tag='water-on-'+colonia;}
+  else if(tipo==='off'){title='🚫 Sin agua — '+colonia;opts.body=mensaje+' · GuardAgua';opts.tag='water-off-'+colonia;opts.requireInteraction=true;}
+  else{title='⚠️ Riesgo de corte — '+colonia;opts.body=mensaje;opts.tag='water-risk-'+colonia;}
+  try{const n=new Notification(title,opts);n.onclick=()=>{window.focus();n.close();};}catch(e){}
+}
+function toggleNotif(on){
+  if(on) requestNotificationPermission();
+  else{localStorage.setItem('guardagua_notif','off');notify('info','🔕 Notificaciones desactivadas','Ya no recibirás alertas push.',true);updateNotifToggle();}
+}
+function updateNotifToggle(){
+  const tog=document.getElementById('notif-toggle');
+  const st=document.getElementById('ns-status');
+  if(!tog||!st) return;
+  if(!('Notification' in window)){tog.checked=false;tog.disabled=true;st.textContent='No soportadas por el navegador';st.style.color='var(--T3)';return;}
+  if(Notification.permission==='denied'){tog.checked=false;st.textContent='Bloqueadas por el navegador ⚠️';st.style.color='var(--O)';return;}
+  const active=localStorage.getItem('guardagua_notif')==='on' && Notification.permission==='granted';
+  tog.checked=active;
+  st.textContent=active?'Activas ✓':'Desactivadas';
+  st.style.color=active?'var(--G)':'var(--T3)';
+}
+function optInYes(){localStorage.setItem('guardagua_notif_asked','1');document.getElementById('notifopt').classList.remove('show');requestNotificationPermission();setTimeout(openModal,450);}
+function optInNo(){localStorage.setItem('guardagua_notif_asked','1');document.getElementById('notifopt').classList.remove('show');setTimeout(openModal,350);}
+function initNotifFlow(){updateNotifToggle();if(('Notification' in window) && !localStorage.getItem('guardagua_notif_asked')){setTimeout(()=>document.getElementById('notifopt').classList.add('show'),500);}else{openModal();}}
 
 // ══════════════════════════════════════════
 // PARTICLES
 // ══════════════════════════════════════════
 function spawnParticles(emoji){
-  for(let i=0;i<8;i++){
+  for(let i=0;i<10;i++){
     const p=document.createElement('div');
     p.className='particle'; p.textContent=emoji;
-    p.style.left=(30+Math.random()*40)+'%';
-    p.style.top=(30+Math.random()*40)+'%';
-    p.style.animationDelay=(Math.random()*.5)+'s';
+    p.style.left=(25+Math.random()*50)+'%';
+    p.style.top=(25+Math.random()*50)+'%';
+    p.style.animationDelay=(Math.random()*.6)+'s';
     document.body.appendChild(p);
-    setTimeout(()=>p.remove(),1800);
+    setTimeout(()=>p.remove(),2000);
   }
 }
 
@@ -1273,38 +1506,37 @@ function mTab(tab,el){
   let html='';
   if(tab==='status'){
     if(!S.userColony){html='<div class="empty">📍 Selecciona tu colonia primero</div>';}
-    else {
+    else{
       const c=S.colonies[S.userColony];
       const hw=c.hasWater;
       const col=hw?(c.riskLevel>0?'var(--O)':'var(--G)'):'var(--R)';
-      html=`
-        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
-          <div><div style="font-weight:800;font-size:1rem">${c.name}</div><div style="color:var(--T3);font-size:.72rem">Tu colonia · Zona ${c.zone}</div></div>
-          <div style="font-size:2rem">${hw?'💧':'🚫'}</div>
+      html=`<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
+        <div><div style="font-weight:800;font-size:1rem">${c.name}</div><div style="color:var(--T3);font-size:.72rem">${c.muni}</div></div>
+        <div style="font-size:2rem">${hw?'💧':'🚫'}</div>
+      </div>
+      <div style="background:${hw?'rgba(var(--G-RGB),.12)':'rgba(var(--R-RGB),.12)'};border:1px solid ${hw?'rgba(var(--G-RGB),.3)':'rgba(var(--R-RGB),.3)'};border-radius:12px;padding:14px;margin-bottom:12px">
+        <div style="color:${col};font-weight:700;font-size:.85rem">${hw?(c.riskLevel>0?'⚠ EN RIESGO':'✓ HAY AGUA'):'✗ NO HAY AGUA'}</div>
+        <div style="color:var(--T2);font-size:.8rem;margin-top:5px">${hw?`Hay agua desde las ${fmt(c.lastChange)}`:`Sin agua desde las ${fmt(c.lastChange)}`}</div>
+        ${!hw&&c.estReturn?`<div style="color:var(--O);font-size:.78rem;margin-top:4px">⏳ Regreso estimado: ${fmt(c.estReturn)}</div>`:''}
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px">
+        <div style="background:rgba(var(--G-RGB),.08);border:1px solid rgba(var(--G-RGB),.2);border-radius:10px;padding:10px;text-align:center">
+          <div style="font-family:var(--MONO);font-size:1.5rem;color:var(--G)">${Object.values(S.colonies).filter(c=>c.hasWater&&c.riskLevel===0).length}</div>
+          <div style="font-size:.6rem;color:var(--T3);margin-top:3px">CON AGUA</div>
         </div>
-        <div style="background:${hw?'rgba(var(--G-RGB),.12)':'rgba(var(--R-RGB),.12)'};border:1px solid ${hw?'rgba(var(--G-RGB),.3)':'rgba(var(--R-RGB),.3)'};border-radius:11px;padding:14px;margin-bottom:12px">
-          <div style="color:${col};font-weight:700;font-size:.85rem">${hw?(c.riskLevel>0?'⚠ EN RIESGO':'✓ HAY AGUA'):'✗ NO HAY AGUA'}</div>
-          <div style="color:var(--T2);font-size:.8rem;margin-top:5px">${hw?`Hay agua desde las ${fmt(c.lastChange)}`:`Sin agua desde las ${fmt(c.lastChange)}`}</div>
-          ${!hw&&c.estReturn?`<div style="color:var(--O);font-size:.78rem;margin-top:4px">⏳ Regreso estimado: ${fmt(c.estReturn)}</div>`:''}
+        <div style="background:rgba(var(--R-RGB),.08);border:1px solid rgba(var(--R-RGB),.2);border-radius:10px;padding:10px;text-align:center">
+          <div style="font-family:var(--MONO);font-size:1.5rem;color:var(--R)">${Object.values(S.colonies).filter(c=>!c.hasWater).length}</div>
+          <div style="font-size:.6rem;color:var(--T3);margin-top:3px">SIN AGUA</div>
         </div>
-        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px">
-          <div style="background:rgba(var(--G-RGB),.08);border:1px solid rgba(var(--G-RGB),.2);border-radius:9px;padding:10px;text-align:center">
-            <div style="font-family:var(--MONO);font-size:1.5rem;color:var(--G)">${Object.values(S.colonies).filter(c=>c.hasWater&&c.riskLevel===0).length}</div>
-            <div style="font-size:.6rem;color:var(--T3);margin-top:3px">CON AGUA</div>
-          </div>
-          <div style="background:rgba(var(--R-RGB),.08);border:1px solid rgba(var(--R-RGB),.2);border-radius:9px;padding:10px;text-align:center">
-            <div style="font-family:var(--MONO);font-size:1.5rem;color:var(--R)">${Object.values(S.colonies).filter(c=>!c.hasWater).length}</div>
-            <div style="font-size:.6rem;color:var(--T3);margin-top:3px">SIN AGUA</div>
-          </div>
-          <div style="background:rgba(var(--O-RGB),.08);border:1px solid rgba(var(--O-RGB),.2);border-radius:9px;padding:10px;text-align:center">
-            <div style="font-family:var(--MONO);font-size:1.5rem;color:var(--O)">${Object.values(S.colonies).filter(c=>c.hasWater&&c.riskLevel>0).length}</div>
-            <div style="font-size:.6rem;color:var(--T3);margin-top:3px">EN RIESGO</div>
-          </div>
+        <div style="background:rgba(var(--O-RGB),.08);border:1px solid rgba(var(--O-RGB),.2);border-radius:10px;padding:10px;text-align:center">
+          <div style="font-family:var(--MONO);font-size:1.5rem;color:var(--O)">${Object.values(S.colonies).filter(c=>c.hasWater&&c.riskLevel>0).length}</div>
+          <div style="font-size:.6rem;color:var(--T3);margin-top:3px">EN RIESGO</div>
         </div>
-        <div style="display:flex;gap:10px;margin-top:14px">
-          <button onclick="reportWater(true)" class="rbtn green">💧 Tengo agua</button>
-          <button onclick="reportWater(false)" class="rbtn red">🚫 No tengo agua</button>
-        </div>`;
+      </div>
+      <div style="display:flex;gap:10px;margin-top:14px">
+        <button onclick="reportWater(true)" class="rbtn green">💧 Tengo agua</button>
+        <button onclick="reportWater(false)" class="rbtn red">🚫 No tengo agua</button>
+      </div>`;
     }
   } else if(tab==='events'){
     html=`<div style="font-weight:700;font-size:.9rem;margin-bottom:12px">📋 Eventos Recientes</div>`+buildEventsTab();
@@ -1322,55 +1554,63 @@ function tickClock(){
 }
 
 // ══════════════════════════════════════════
-// SELECT POPULATE
+// SELECT POPULATE — agrupado por municipio
 // ══════════════════════════════════════════
 function populateSelect(){
   const sel=document.getElementById('csel');
-  [...COLONIES_RAW].sort((a,b)=>a.name.localeCompare(b.name)).forEach(c=>{
-    const o=document.createElement('option');
-    o.value=c.id; o.textContent=c.name;
-    sel.appendChild(o);
+  const munis=["Aguascalientes","San Francisco de los Romo","Jesús María","El Llano"];
+  munis.forEach(muni=>{
+    const grp=document.createElement('optgroup');
+    grp.label=muni;
+    COLONIES_RAW.filter(c=>c.muni===muni).sort((a,b)=>a.name.localeCompare(b.name)).forEach(c=>{
+      const o=document.createElement('option');
+      o.value=c.id; o.textContent=c.name+(muni!=='Aguascalientes'?'':'')+' — '+c.zone;
+      grp.appendChild(o);
+    });
+    sel.appendChild(grp);
   });
 }
 
 // ══════════════════════════════════════════
 // SPLASH STEPS
 // ══════════════════════════════════════════
-const STEPS=['Conectando con sensores IoT...','Cargando red hídrica...','Procesando reportes...','¡Listo!'];
+const STEPS=[
+  'Conectando con sensores IoT...',
+  'Cargando red hídrica de 4 municipios...',
+  'Procesando reportes en tiempo real...',
+  '¡Todo listo!'
+];
 let si=0;
 function nextStep(){
   if(si>=STEPS.length) return;
-  document.getElementById('s-steps').textContent=STEPS[si++];
-  if(si<STEPS.length) setTimeout(nextStep,600);
+  const el=document.getElementById('s-steps');
+  el.innerHTML=`<span class="s-step-text">${STEPS[si++]}</span>`;
+  if(si<STEPS.length) setTimeout(nextStep,650);
 }
 
 // ══════════════════════════════════════════
-// REPORTE MANUAL DE USUARIO
+// REPORTE MANUAL
 // ══════════════════════════════════════════
 function reportWater(status){
-  if(!S.userColony){ openModal(); return; }
+  if(!S.userColony){openModal();return;}
   const c=S.colonies[S.userColony];
   c.hasWater=status; c.lastChange=new Date(); c.riskLevel=0; c.estGone=null;
   if(!status && !c.estReturn) c.estReturn=new Date(Date.now()+(1.2+Math.random()*3.8)*3600000);
   if(status) c.estReturn=null;
-
   addEvent(status?'on':'off',S.userColony,`<strong>${c.name}</strong> — reporte de vecino: ${status?'sí hay agua':'no hay agua'} a las ${fmt(c.lastChange)}`);
-  drawColony(c.id);
-  updateSC();
-  updateAll();
-
-  notify(
-    status?'water-on':'water-off',
+  drawColony(c.id); updateSC(); updateAll();
+  notify(status?'water-on':'water-off',
     status?`💧 Reportaste agua en ${c.name}`:`🚫 Reportaste falta de agua en ${c.name}`,
-    status?`Gracias. Registramos que SÍ hay agua en ${c.name}.`:`Gracias. Registramos que NO hay agua en ${c.name}. Avisaremos a la zona.`,
-    true
-  );
+    status?`Gracias. Registramos que SÍ hay agua en ${c.name}.`:`Gracias. Registramos que NO hay agua en ${c.name}. Avisaremos a la zona.`,true);
+  if(status) spawnParticles('💧');
+  sendPushNotification(status?'on':'off',c.name,status?`Confirmaste que sí hay agua en ${c.name}.`:`Confirmaste que no hay agua en ${c.name}.`);
 }
 
 // ══════════════════════════════════════════
 // BOOT
 // ══════════════════════════════════════════
 window.addEventListener('load',()=>{
+  createSplashParticles();
   populateSelect();
   setTimeout(nextStep,400);
   setTimeout(()=>{
@@ -1381,37 +1621,32 @@ window.addEventListener('load',()=>{
       app.classList.add('on');
       initMap();
       updateAll();
-      setTimeout(openModal,600);
-      setTimeout(simLoop,8000);
+      setTimeout(initNotifFlow,700);
+      setTimeout(simLoop,9000);
       tickClock();
       setInterval(tickClock,1000);
       setInterval(updateAll,12000);
       setInterval(updateSC,6000);
-    },900);
-  },3000);
+    },1000);
+  },3200);
 });
 
 window.setColony=setColony;
 window.reportWater=reportWater;
 window.S=S;
+window.optInYes=optInYes;
+window.optInNo=optInNo;
+window.toggleNotif=toggleNotif;
+window.requestNotificationPermission=requestNotificationPermission;
+window.dismissNotif=dismissNotif;
 
 // ══════════════════════════════════════════
 // SECTOR POLÍTICO
 // ══════════════════════════════════════════
-function openPolPanel(){
-  document.getElementById('polpanel').classList.add('show');
-}
-function closePolPanelDirect(){
-  document.getElementById('polpanel').classList.remove('show');
-}
-function closePolPanel(e){
-  if(e.target===document.getElementById('polpanel'))
-    document.getElementById('polpanel').classList.remove('show');
-}
-function toggleOds(id){
-  const card=document.getElementById(id);
-  card.classList.toggle('open');
-}
+function openPolPanel(){document.getElementById('polpanel').classList.add('show');updateNotifToggle();}
+function closePolPanelDirect(){document.getElementById('polpanel').classList.remove('show');}
+function closePolPanel(e){if(e.target===document.getElementById('polpanel')) document.getElementById('polpanel').classList.remove('show');}
+function toggleOds(id){document.getElementById(id).classList.toggle('open');}
 window.openPolPanel=openPolPanel;
 window.closePolPanelDirect=closePolPanelDirect;
 window.closePolPanel=closePolPanel;
